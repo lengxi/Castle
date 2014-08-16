@@ -3,11 +3,41 @@
 </head>
 
 <body>
-	{{> loginButtons}}
 </body>
 
-<template name="hello">
-  <h1>Hello World!</h1>
-  {{greeting}}
-  <input type="button" value="Click" />
+<template name="home">
+  {{#if hasUser}}
+  	<h1>Hi {{userDisplayName}}! Click to join room.</h1>
+    <input id="create_room" type='button' value='Create Room' />
+  	{{> rooms}}
+  {{else}}
+  	<h1>Please log in!</h1>
+  	{{> loginButtons}}
+  {{/if}}
+</template>
+
+<template name="rooms">
+  {{#each rooms}}
+    {{> room}}
+  {{/each}}
+</template>
+
+<template name="room">
+  <div style="border: 2px solid;">
+    <span>{{_id}}</span>
+    <ul>
+      {{#each users}}
+        {{> userName}}
+      {{/each}}
+    </ul>
+    <input id="join_room" type='button' value='Join'>
+  </div>
+</template>
+
+<template name="userName">
+  <li>{{userDisplayName}}</li>
+</template>
+
+<template name="game">
+
 </template>
