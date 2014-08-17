@@ -9,24 +9,24 @@
     <h4>It's your turn! Choose an action: </h4>
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
   {{else}}
-    <h4>Waiting on {{getDisplayName state.user}} to choose an action.</h4>
+    <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
   {{/if}}
 </template>
 
 <template name="PLAY_PROFESSION">
   {{#if is_my_action}}
-    {{#if state.meta.success}}
-      <h4>You have chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
+    {{#if game.state.meta.success}}
+      <h4>You have chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
       <input class="btn btn-success play_success" type="button" value="Next" />
     {{else}}
       <h4>Trying to play profession...Did not succeed.</h4>
       <input class="btn btn-failure play_failure" type="button" value="Go back" />
     {{/if}} 
   {{else}}
-    {{#if state.meta.success}}
-      <h4>{{getDisplayName state.user}} has chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
+    {{#if game.state.meta.success}}
+      <h4>{{getDisplayName game.state.user}} has chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
     {{else}}
-      <h4>{{getDisplayName state.user}}'s action did not succeed.</h4>
+      <h4>{{getDisplayName game.state.user}} tried to play profession...Did not succeed.</h4>
     {{/if}} 
   {{/if}}
 </template>

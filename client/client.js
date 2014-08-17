@@ -51,7 +51,7 @@ Deps.autorun(function(c) {
 
 Template.action.my_action_template = function() {
   return STATE_TEMPLATES[Games.findOne().state.action];
-};
+}; 
 
 
 
@@ -66,10 +66,10 @@ Template.TURN_START.events({
 });
 
 Template.PLAY_PROFESSION.events({
-  'click .play_success': function() {
-    Meteor.call('handle_callback', this._id, Meteor.user()._id);
+  'click .play_success': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
   },
-  'click .play_failure': function() {
-    Meteor.call('handle_callback', this._id, Meteor.user()._id);
+  'click .play_failure': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
   }
 })
