@@ -6,36 +6,46 @@
 </body>
 
 <template name="home">
-  {{#if hasUser}}
-  	<h1>Hi {{userDisplayName}}! Click to join room.</h1>
-    <input id="create_room" type='button' value='Create Room' />
-  	{{> rooms}}
-  {{else}}
-  	<h1>Please log in!</h1>
-  	{{> loginButtons}}
-  {{/if}}
+  <div class="container">
+    <div class="center jumbotron">
+    {{#if hasUser}}
+  	  <h1>Hi {{userDisplayName}}! Click to join room.</h1>
+      <input id="create_room" type='button' value='Create Room' class="btn btn-lg btn-default"/>
+  	  {{> rooms}}
+    {{else}}
+      <h1>Want to play Castle of the Devil?</h1>
+  	  <p class="lead">Please log in!</p>
+  	   {{> loginButtons}}
+    {{/if}}
+    </div>
+  </div>
 </template>
 
 <template name="rooms">
+ 
   {{#each rooms}}
     {{> room}}
   {{/each}}
+
 </template>
 
 <template name="room">
-  <div style="border: 2px solid;">
-    <span>{{_id}}</span>
-    <ul>
+  <div class="row room_content">
+    <h4>Room name: {{_id}}</h4>
+    <h4>Current players:</h4>
+    <ul class="list-unstyled">
       {{#each users}}
         {{> userName}}
       {{/each}}
     </ul>
-    <input id="join_room" type='button' value='Join'>
+    <input id="join_room" type='button' value='Join' class="btn btn-success">
+    <!--TODO add leave_room functionality-->
+    <input id="leave_room" type='button' value='Leave' class="btn btn-failure">
   </div>
 </template>
 
 <template name="userName">
-  <li>{{userDisplayName}}</li>
+  <li class="username"><h5>{{userDisplayName}}</h5></li>
 </template>
 
 <template name="game">
