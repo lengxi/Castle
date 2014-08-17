@@ -46,6 +46,7 @@ Deps.autorun(function() {
   }
 });
 
+/*
 Template.game.context = function() {
   return Games.findOne();
 };
@@ -54,6 +55,9 @@ Template.game.me = function() {
     return p._id === Meteor.user()._id;
   });
 }
+*/
+
+// TODO change to Template.action probably
 Template.game.get_template_for_action_state = function() {
   return Template.TURN_START_ACTION;
 }

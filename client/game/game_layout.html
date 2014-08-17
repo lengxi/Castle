@@ -1,0 +1,25 @@
+<!-- layout for the game page, outlines where the 5 widgets go -->
+<!-- http://www.manuel-schoebel.com/blog/iron-router-tutorial -->
+<template name='game_layout'>
+Game layout
+  <div name='dashboard'>
+    {{> dashboard}} 
+  </div>
+
+  <div name='action'>
+    {{> action}}
+  </div>
+
+  <div name='feed'>
+    {{> feed}}
+  </div>
+
+  <div name='hand'>
+    {{> hand}}
+  </div>
+
+  <!--shows other players' statuses-->
+  <div name='table'>
+    {{> table}}
+  </div>
+</template>
