@@ -49,15 +49,7 @@ Deps.autorun(function(c) {
   }
 });
 
-Template.game.context = function() {
-  return Games.findOne();
-};
-Template.game.me = function() {
-  return _.find(Games.findOne().players, function(p) {
-    return p._id === Meteor.user()._id;
-  });
-}
-Template.game.my_action_template = function() {
+Template.action.my_action_template = function() {
   return STATE_TEMPLATES[Games.findOne().state.action];
 };
 
@@ -65,11 +57,11 @@ Template.game.my_action_template = function() {
 
 UI.registerHelper('is_my_action', function() {
   return Games.findOne().state.wait_on === Meteor.user()._id;
-}); 
+});
 
 Template.TURN_START.events({
-  'click #play_profession': function() {
-    Meteor.call('play_profession', this._id, Meteor.user()._id);
+  'click #play_profession': function(event, template) {
+    Meteor.call('play_profession', template.data.game._id, Meteor.user()._id);
   }
 });
 

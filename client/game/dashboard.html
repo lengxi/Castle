@@ -1,0 +1,19 @@
+<template name='dashboard'>
+<p>dashboard template</p>
+  <p>Game: {{game._id}}</p>
+  <h3>My Status</h3>
+  <ul>
+    <li>{{getDisplayName me._id}}</li>
+    <li>
+      {{#if me.assoc}}
+        Society of Open Secrets
+      {{else}}
+        Order of True Lies
+      {{/if}}
+    </li>
+    <li>Turn Order: {{me.turn}}</li>
+    <li>Profession: {{getProfessionName me.prof}}</li>
+  </ul>
+
+<p>end dashboard template</p>
+</template>

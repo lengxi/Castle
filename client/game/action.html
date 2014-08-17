@@ -1,0 +1,32 @@
+<template name='action'>
+<p>action template</p>
+  {{> my_action_template}}
+<p>end action template</p>
+</template>
+
+<template name="TURN_START">
+  {{#if is_my_action}}
+    <h4>It's your turn! Choose an action: </h4>
+    <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
+  {{/if}}
+</template>
+
+
+<template name="PLAY_PROFESSION">
+  {{#if is_my_action}}
+    {{#if game.state.meta.success}}
+      <h4>You have chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
+      <input class="btn btn-success play_profession" type="button" value="Next" />
+    {{else}}
+      <h4>Trying to play profession...</h4>
+    {{/if}}
+  {{else}}
+    {{#if game.state.meta.success}}
+      <h4>{{getDisplayName game.state.user}} has chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
+    {{else}}
+      <h4>Waiting on {{getDisplayName game.state.user}} to finish playing profession.</h4>
+    {{/if}}
+  {{/if}}
+</template>

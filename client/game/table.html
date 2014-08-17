@@ -1,0 +1,12 @@
+<template name='table'>
+table templatew
+  <h3>Players</h3>
+  <ul class="player-statuses">
+  {{#each game.players}}
+    <li>
+      {{getDisplayName this._id}}
+    </li>
+  {{/each}}
+  </ul>
+end table template
+</template>

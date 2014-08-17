@@ -47,66 +47,6 @@
 </template>
 
 <template name="game">
-  {{#with context}}
-    <h1>Game {{_id}}</h1>
-    {{> player_statuses}}
-    {{#with me}}
-      {{> my_status}}
-    {{/with}}
-    <h3>My actions</h3>
-    {{> my_action_template}}
-  {{/with}}
+  {{> game_layout}}
 </template>
 
-<template name="player_statuses">
-  <h3>Players</h3>
-  <ul class="player-statuses">
-  {{#each players}}
-    <li>
-      {{getDisplayName _id}}
-  </li>
-  {{/each}}
-  </ul>
-</template>
-
-<template name="my_status">
-  <h3>My Status</h3>
-  <ul>
-    <li>{{getDisplayName _id}}</li>
-    <li>
-      {{#if this.assoc}}
-        Society of Open Secrets
-      {{else}}
-        Order of True Lies
-      {{/if}}
-    </li>
-    <li>Turn Order: {{this.turn}}</li>
-    <li>Profession: {{getProfessionName this.prof}}</li>
-  </ul>
-</template>
-
-<template name="TURN_START">
-  {{#if is_my_action}}
-    <h4>It's your turn! Choose an action: </h4>
-    <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
-  {{else}}
-    <h4>Waiting on {{getDisplayName state.user}} to choose an action.</h4>
-  {{/if}}
-</template>
-
-<template name="PLAY_PROFESSION">
-  {{#if is_my_action}}
-    {{#if state.meta.success}}
-      <h4>You have chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
-      <input class="btn btn-success play_profession" type="button" value="Next" />
-    {{else}}
-      <h4>Trying to play profession...</h4>
-    {{/if}} 
-  {{else}}
-    {{#if state.meta.success}}
-      <h4>{{getDisplayName state.user}} has chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
-    {{else}}
-      <h4>Waiting on {{getDisplayName state.user}} to finish playing profession.</h4>
-    {{/if}} 
-  {{/if}}
-</template>
