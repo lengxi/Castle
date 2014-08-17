@@ -9,7 +9,7 @@
   <div class="container">
     <div class="center jumbotron">
     {{#if hasUser}}
-      <h1>Hi {{getDisplayName user}}! Click to join room.</h1>
+      <h1>Hi {{getDisplayName user._id}}! Click to join room.</h1>
       <input id="create_room" type='button' value='Create Room' class="btn btn-lg btn-default"/>
       {{> rooms}}
     {{else}}
@@ -35,7 +35,7 @@
     <h4>Current players:</h4>
     <ul class="list-unstyled">
       {{#each users}}
-        <li class="username"><h5>{{getDisplayName this}}</h5></li>
+        <li class="username"><h5>{{getDisplayName _id}}</h5></li>
       {{/each}}
     </ul>
     {{#if notCreator}}
@@ -51,9 +51,10 @@
     <h1>Game {{_id}}</h1>
     {{> player_statuses}}
     {{#with me}}
-    {{> my_status}}
+      {{> my_status}}
     {{/with}}
-    {{> get_template_for_action_state}}
+    <h3>My actions</h3>
+    {{> my_action_template}}
   {{/with}}
 </template>
 
@@ -62,7 +63,7 @@
   <ul class="player-statuses">
   {{#each players}}
     <li>
-      {{getDisplayName this}}
+      {{getDisplayName _id}}
   </li>
   {{/each}}
   </ul>
@@ -71,7 +72,7 @@
 <template name="my_status">
   <h3>My Status</h3>
   <ul>
-    <li>{{getDisplayName this}}</li>
+    <li>{{getDisplayName _id}}</li>
     <li>
       {{#if this.assoc}}
         Society of Open Secrets
@@ -84,6 +85,28 @@
   </ul>
 </template>
 
-<template name="TURN_START_ACTION">
+<template name="TURN_START">
+  {{#if is_my_action}}
+    <h4>It's your turn! Choose an action: </h4>
+    <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
+  {{else}}
+    <h4>Waiting on {{getDisplayName state.user}} to choose an action.</h4>
+  {{/if}}
+</template>
 
+<template name="PLAY_PROFESSION">
+  {{#if is_my_action}}
+    {{#if state.meta.success}}
+      <h4>You have chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
+      <input class="btn btn-success play_profession" type="button" value="Next" />
+    {{else}}
+      <h4>Trying to play profession...</h4>
+    {{/if}} 
+  {{else}}
+    {{#if state.meta.success}}
+      <h4>{{getDisplayName state.user}} has chosen to play {{getProfessionName state.meta.prof_id}}!</h4>
+    {{else}}
+      <h4>Waiting on {{getDisplayName state.user}} to finish playing profession.</h4>
+    {{/if}} 
+  {{/if}}
 </template>

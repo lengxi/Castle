@@ -2,15 +2,18 @@
 Meteor.subscribe('userData');
 Meteor.subscribe('rooms');
 Meteor.subscribe('games');
-Meteor.subscribe('me');
 
-Handlebars.registerHelper('getDisplayName', function(obj) {
-  var user = Meteor.users.findOne({_id: obj._id});
+Handlebars.registerHelper('getDisplayName', function(id) {
+  var user = Meteor.users.findOne({_id: id});
   return user.services.github.username;
 });
 Handlebars.registerHelper('getProfessionName', function(id) {
   return PROF[id].name;
 });
+
+STATE_TEMPLATES = [];
+STATE_TEMPLATES[0] = Template.TURN_START;
+STATE_TEMPLATES[1] = Template.PLAY_PROFESSION;
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -39,10 +42,10 @@ Template.room.events({
   }
 });
 
-Deps.autorun(function() {
+Deps.autorun(function(c) {
   if (Games.find().fetch().length > 0) {
-
     Router.go('game');
+    c.stop();
   }
 });
 
@@ -54,11 +57,24 @@ Template.game.me = function() {
     return p._id === Meteor.user()._id;
   });
 }
-Template.game.get_template_for_action_state = function() {
-  return Template.TURN_START_ACTION;
-}
-Template.game.events = {
-  'click input': function(){
+Template.game.my_action_template = function() {
+  return STATE_TEMPLATES[Games.findOne().state.action];
+};
+
+
+
+UI.registerHelper('is_my_action', function() {
+  return Games.findOne().state.wait_on === Meteor.user()._id;
+}); 
+
+Template.TURN_START.events({
+  'click #play_profession': function() {
+    Meteor.call('play_profession', this._id, Meteor.user()._id);
+  }
+});
+
+Template.PLAY_PROFESSION.events({
+  'click input': function() {
 
   }
-};
+})

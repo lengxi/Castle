@@ -35,7 +35,10 @@ Meteor.methods({
         turn: k,
         assoc: k % 2,
         prof: Professions.MOCK._id,
-        cards: [Cards.MOCK._id, Cards.MOCK._id, Cards.MOCK._id]
+        prof_state: 0,
+        cards: [ {card: Cards.MOCK._id, card_state: 0},
+                 {card: Cards.MOCK._id, card_state: 0},
+                 {card: Cards.MOCK._id, card_state: 0}]
       };
       return player;
     });
@@ -43,7 +46,7 @@ Meteor.methods({
     var game = {
       players: players,
       state: {
-        action: Engine.TURN_START_ACTION._id,
+        action: Engine.TURN_START._id,
         user: user._id,
         wait_on: user._id,
         meta: {}
@@ -53,6 +56,34 @@ Meteor.methods({
     Games.insert(game);
 
     return true;
+  },
+  play_profession: function(game_id, userId) {
+    var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if ((game.state.action === Engine.TURN_START._id ||
+           game.state.action === Engine.FREE_STATE._id ) &&
+          game.state.wait_on === userId) {
+
+        game.state = {
+            action: Engine.PLAY_PROFESSION._id,
+            user: userId,
+            wait_on: userId,
+            meta: {
+              success: false,
+              prof_id: getPlayer(game.players, userId).prof
+            }
+          };
+
+        Games.update({_id: game._id}, {$set: { state: game.state }});
+
+        var res = ENGINE[game.state.action].doAction(game._id);
+        if (res.success === true) {
+          Games.update({_id: game._id}, {$set: {"state.meta": res}});
+        } else {
+          Games.update({_id: game._id}, {$set: {state: res.next_state}});
+        }
+      }
+    }
   }
 });
 
