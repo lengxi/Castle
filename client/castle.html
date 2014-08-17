@@ -50,7 +50,9 @@
   {{#with context}}
     <h1>Game {{_id}}</h1>
     {{> player_statuses}}
+    {{#with me}}
     {{> my_status}}
+    {{/with}}
     {{> get_template_for_action_state}}
   {{/with}}
 </template>
@@ -69,16 +71,16 @@
 <template name="my_status">
   <h3>My Status</h3>
   <ul>
-    <li>{{getDisplayName me}}</li>
+    <li>{{getDisplayName this}}</li>
     <li>
-      {{#if me.assoc}}
+      {{#if this.assoc}}
         Society of Open Secrets
       {{else}}
         Order of True Lies
       {{/if}}
     </li>
-    <li>Turn Order: {{me.turn}}</li>
-    <li>Profession: {{getProfessionName me.prof}}</li>
+    <li>Turn Order: {{this.turn}}</li>
+    <li>Profession: {{getProfessionName this.prof}}</li>
   </ul>
 </template>
 

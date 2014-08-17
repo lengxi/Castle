@@ -1,9 +1,8 @@
-Rooms = new Meteor.Collection("rooms");
-Games = new Meteor.Collection("games");
 
 Meteor.subscribe('userData');
 Meteor.subscribe('rooms');
 Meteor.subscribe('games');
+Meteor.subscribe('me');
 
 Handlebars.registerHelper('getDisplayName', function(obj) {
   var user = Meteor.users.findOne({_id: obj._id});
@@ -36,17 +35,25 @@ Template.room.events({
     Meteor.call('join_room', this._id, Meteor.user());
   },
   'click #start_game': function () {
-    Meteor.call('start_game', this._id, Meteor.user(), function(e, r) {
-      if (r === true) {
-        Router.go('game');
-      }
-    });
+    Meteor.call('start_game', this._id, Meteor.user());
+  }
+});
+
+Deps.autorun(function() {
+  if (Games.find().fetch().length > 0) {
+
+    Router.go('game');
   }
 });
 
 Template.game.context = function() {
   return Games.findOne();
 };
+Template.game.me = function() {
+  return _.find(Games.findOne().players, function(p) {
+    return p._id === Meteor.user()._id;
+  });
+}
 Template.game.get_template_for_action_state = function() {
   return Template.TURN_START_ACTION;
 }

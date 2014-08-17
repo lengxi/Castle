@@ -1,9 +1,8 @@
-Rooms = new Meteor.Collection("rooms");
-Games = new Meteor.Collection("games");
+
 
 Meteor.publish("userData", function () {
-  return Meteor.users.find({_id: this.userId},
-                           {fields: {'services': 1}});
+  return Meteor.users.find({},
+    {fields: {'services.github.username': 1, '_id':1}});
 });
 
 Meteor.publish("rooms", function () {
@@ -11,9 +10,9 @@ Meteor.publish("rooms", function () {
 });
 
 Meteor.publish("games", function () {
-    return Games.find({players: {$elemMatch: {_id: this.userId}}},
-      {fields: {"players.assoc": 0, "players.prof": 0, "players.cards": 0}});
+    return Games.find({players: {$elemMatch: {_id: this.userId}}});
 });
+
 
 Meteor.methods({
   create_room: function(newUser) {
@@ -29,7 +28,6 @@ Meteor.methods({
   start_game: function(room_id, user) {
     var room = Rooms.findOne({_id: room_id});
     Rooms.remove({_id: room_id});
-    var me = {};
 
     var players = _.map(room.users, function(u, k) {
       var player = { 
@@ -39,14 +37,10 @@ Meteor.methods({
         prof: Professions.MOCK._id,
         cards: [Cards.MOCK._id, Cards.MOCK._id, Cards.MOCK._id]
       };
-      if (u._id === user._id) {
-        me = player;
-      }
       return player;
     });
 
     var game = {
-      me: me,
       players: players,
       state: {
         action: Engine.TURN_START_ACTION._id,
