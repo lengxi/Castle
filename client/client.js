@@ -66,7 +66,10 @@ Template.TURN_START.events({
 });
 
 Template.PLAY_PROFESSION.events({
-  'click input': function() {
-
+  'click .play_success': function() {
+    Meteor.call('handle_callback', this._id, Meteor.user()._id);
+  },
+  'click .play_failure': function() {
+    Meteor.call('handle_callback', this._id, Meteor.user()._id);
   }
 })

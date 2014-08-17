@@ -57,6 +57,38 @@ Meteor.methods({
 
     return true;
   },
+  handle_callback: function(game_id, userId) {
+    var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.meta.hasOwnProperty('next_state')) {
+        var next = game.state.meta.next_state;
+        
+        // do whatever needs to be done before we transition
+        if (next.meta.hasOwnProperty('callback')) {
+          ENGINE[next.meta.callback.type].callback(next.meta.callback.data);
+        }
+
+        // transition to next state
+        switch(next.action) {
+          case Engine.TURN_START._id: 
+            game.state = {
+              action: next.action,
+              user: next.user,
+              wait_on: next.user,
+              meta: {}
+            }
+            Games.update({_id: game_id}, {$set: { state: game.state }});
+            break;
+          case Engine.PLAY_PROFESSION._id:
+            this.play_profession(game_id, userId);
+            break;
+          case Engine.FREE_RESPONSE._id:
+            this.free_response(game_id, userId);
+          default:
+        }
+      }
+    }
+  },
   play_profession: function(game_id, userId) {
     var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
@@ -80,10 +112,13 @@ Meteor.methods({
         if (res.success === true) {
           Games.update({_id: game._id}, {$set: {"state.meta": res}});
         } else {
-          Games.update({_id: game._id}, {$set: {state: res.next_state}});
+          Games.update({_id: game._id}, {$set: {"state.meta": res}});
         }
       }
     }
+  },
+  free_response: function(game_id, userId) {
+    
   }
 });
 
