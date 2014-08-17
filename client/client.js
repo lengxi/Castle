@@ -5,11 +5,19 @@ Meteor.subscribe('userData');
 Meteor.subscribe('rooms');
 Meteor.subscribe('games');
 
+Handlebars.registerHelper('getDisplayName', function(obj) {
+  var user = Meteor.users.findOne({_id: obj._id});
+  return user.services.github.username;
+});
+Handlebars.registerHelper('getProfessionName', function(id) {
+  return PROF[id].name;
+});
+
 Template.home.hasUser = function () {
   return Meteor.user() != null;
 };
-Template.home.userDisplayName = function () {
-  return Meteor.user().services.github.username;
+Template.home.user = function () {
+  return Meteor.user();
 };
 Template.home.events({
   'click #create_room': function() {
@@ -17,36 +25,33 @@ Template.home.events({
   }
 })
 
-
-
 Template.rooms.rooms = function() {
   return Rooms.find({});
 };
-
-
-
+Template.room.notCreator = function() {
+  return this.creator !== Meteor.user()._id;
+}
 Template.room.events({
   'click #join_room': function () {
     Meteor.call('join_room', this._id, Meteor.user());
+  },
+  'click #start_game': function () {
+    Meteor.call('start_game', this._id, Meteor.user(), function(e, r) {
+      if (r === true) {
+        Router.go('game');
+      }
+    });
   }
 });
 
-
-
-Template.userName.userDisplayName = function () {
-  return this.services.github.username;
+Template.game.context = function() {
+  return Games.findOne();
 };
-
-
-
+Template.game.get_template_for_action_state = function() {
+  return Template.TURN_START_ACTION;
+}
 Template.game.events = {
   'click input': function(){
 
-    var my_id = Session.get('user_id');
-    var opponent_id = this._id;
-
-    // let the server handle the collision detection etc.
-    var response = Meteor.call('start_game', my_id, opponent_id);
-    console.log('--> game started');
   }
 };

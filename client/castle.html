@@ -9,13 +9,13 @@
   <div class="container">
     <div class="center jumbotron">
     {{#if hasUser}}
-  	  <h1>Hi {{userDisplayName}}! Click to join room.</h1>
+      <h1>Hi {{getDisplayName user}}! Click to join room.</h1>
       <input id="create_room" type='button' value='Create Room' class="btn btn-lg btn-default"/>
-  	  {{> rooms}}
+      {{> rooms}}
     {{else}}
       <h1>Want to play Castle of the Devil?</h1>
-  	  <p class="lead">Please log in!</p>
-  	   {{> loginButtons}}
+      <p class="lead">Please log in!</p>
+       {{> loginButtons}}
     {{/if}}
     </div>
   </div>
@@ -35,19 +35,53 @@
     <h4>Current players:</h4>
     <ul class="list-unstyled">
       {{#each users}}
-        {{> userName}}
+        <li class="username"><h5>{{getDisplayName this}}</h5></li>
       {{/each}}
     </ul>
-    <input id="join_room" type='button' value='Join' class="btn btn-success">
-    <!--TODO add leave_room functionality-->
+    {{#if notCreator}}
+      <input id="join_room" type='button' value='Join' class="btn btn-success">
+    {{/if}}
+    <input id="start_game" type='button' value='Start' class="btn btn-success">
     <input id="leave_room" type='button' value='Leave' class="btn btn-failure">
   </div>
 </template>
 
-<template name="userName">
-  <li class="username"><h5>{{userDisplayName}}</h5></li>
+<template name="game">
+  {{#with context}}
+    <h1>Game {{_id}}</h1>
+    {{> player_statuses}}
+    {{> my_status}}
+    {{> get_template_for_action_state}}
+  {{/with}}
 </template>
 
-<template name="game">
+<template name="player_statuses">
+  <h3>Players</h3>
+  <ul class="player-statuses">
+  {{#each players}}
+    <li>
+      {{getDisplayName this}}
+  </li>
+  {{/each}}
+  </ul>
+</template>
+
+<template name="my_status">
+  <h3>My Status</h3>
+  <ul>
+    <li>{{getDisplayName me}}</li>
+    <li>
+      {{#if me.assoc}}
+        Society of Open Secrets
+      {{else}}
+        Order of True Lies
+      {{/if}}
+    </li>
+    <li>Turn Order: {{me.turn}}</li>
+    <li>Profession: {{getProfessionName me.prof}}</li>
+  </ul>
+</template>
+
+<template name="TURN_START_ACTION">
 
 </template>
