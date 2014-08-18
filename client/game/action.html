@@ -1,13 +1,12 @@
 <template name='action'>
-<p>action template</p>
   {{> my_action_template}}
-<p>end action template</p>
 </template>
 
 <template name="TURN_START">
   {{#if is_my_action}}
     <h4>It's your turn! Choose an action: </h4>
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
+    <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
   {{else}}
     <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
   {{/if}}
@@ -29,4 +28,60 @@
       <h4>{{getDisplayName game.state.user}} tried to play profession...Did not succeed.</h4>
     {{/if}} 
   {{/if}}
+</template>
+
+<template name="DECLARE_VICTORY">
+  {{#if is_my_action}}
+  <div class="form-group">
+    <p>Declare victory for:</p>
+    <label class="radio-inline">
+      <input type="radio" name="nominated_team" id="blue" value="0" checked>
+      {{get_association_name 0}}
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="nominated_team" id="red" value="1">
+      {{get_association_name 1}}
+    </label>
+    <p>Nominate players:</p>
+    {{#each game.players}}
+    <label>
+      <input type="checkbox" name="nominated_player" value="{{this._id}}">{{getDisplayName this._id}}
+    </label>
+    {{/each}}
+    <div>
+      <input class="btn btn-success" id="make_declaration" type="button" value="Make Declaration" />
+      <input class="btn btn-failure" type="button" value="Go back" />
+    </div>
+  </div>
+  {{else}}
+   <h4>{{getDisplayName game.state.user}} is declaring victory!!</h4>
+  {{/if}}
+</template>
+
+<template name="FINISH_DECLARE_VICTORY">
+  <div>
+  {{getDisplayName game.state.user}} declared victory for team:
+  {{get_association_name game.state.meta.nominated_team}}
+  with teammates:
+  {{#each game.state.meta.nominated_player_ids}}
+    {{getDisplayName this}}
+  {{/each}}
+  </div>
+
+  <h4>
+  {{#if game.state.meta.res}}
+    Declaration successful
+  {{else}}
+    Declaration unsuccessful
+  {{/if}}
+  </h4>
+
+  <h4>
+  {{#if did_i_win me.assoc}}
+    Congrats, you win!
+  {{else}}
+    Sorry, you lose!
+  {{/if}}
+  </h4>
+
 </template>

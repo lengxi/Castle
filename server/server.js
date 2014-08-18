@@ -62,7 +62,6 @@ Meteor.methods({
     if (game !== null) {
       if (game.state.meta.hasOwnProperty('next_state')) {
         var next = game.state.meta.next_state;
-        
         // do whatever needs to be done before we transition
         if (next.meta.hasOwnProperty('callback')) {
           ENGINE[next.meta.callback.type].callback(next.meta.callback.data);
@@ -119,7 +118,62 @@ Meteor.methods({
   },
   free_response: function(game_id, userId) {
     
-  }
+  },
+
+  // changes game state to declare victory
+  declare_victory: function(game_id, userId) {
+    var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.action === Engine.TURN_START._id && game.state.wait_on === userId) {
+        game.state = {
+          action: Engine.DECLARE_VICTORY._id,
+          user: userId,
+          wait_on: userId,
+          meta: {
+            success: true,
+          }
+        };
+
+        Games.update({_id: game._id}, {$set: { state: game.state }});
+
+        var res = ENGINE[game.state.action].doAction(game._id);
+        if (res.success === true) {
+          Games.update({_id: game._id}, {$set: {"state.meta": res}});
+        } else {
+          Games.update({_id: game._id}, {$set: {"state.meta": res}});
+        }
+      }
+    }
+  },
+
+  // players are the players you nominate
+  // Do victory condition checking in this state
+  finish_declare_victory: function(game_id, userId, nominated_team, nominated_player_ids) {
+    var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.action === Engine.DECLARE_VICTORY._id && game.state.wait_on === userId) {
+        game.state = {
+          action: Engine.FINISH_DECLARE_VICTORY._id,
+          user: userId,
+          wait_on: userId,
+          meta: {
+            success: false,
+            nominated_team: nominated_team,
+            nominated_player_ids: nominated_player_ids
+          }
+        };
+
+        Games.update({_id: game._id}, {$set: { state: game.state }});
+        var res = ENGINE[game.state.action].doAction(game._id, nominated_team, nominated_player_ids);
+        var meta = {
+          res: res,
+          nominated_team: nominated_team,
+          nominated_player_ids: nominated_player_ids
+        };
+        Games.update({_id: game._id}, {$set: {"state.meta": meta}});
+      }
+    }
+  },
 });
 
 Meteor.startup(function() {
