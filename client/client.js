@@ -1,4 +1,3 @@
-
 Meteor.subscribe('userData');
 Meteor.subscribe('rooms');
 Meteor.subscribe('games');
@@ -7,9 +6,15 @@ Handlebars.registerHelper('getDisplayName', function(id) {
   var user = Meteor.users.findOne({_id: id});
   return user.services.github.username;
 });
+
 Handlebars.registerHelper('getProfessionName', function(id) {
   return getProfById(id).name;
 });
+
+Handlebars.registerHelper('get_association_name', function(assoc_id) {
+  return ASSOCIATIONS[assoc_id];
+});
+
 
 STATE_TEMPLATES = [];
 STATE_TEMPLATES[0] = Template.TURN_START;
@@ -67,7 +72,7 @@ Template.TURN_START.events({
     Meteor.call('play_profession', template.data.game._id, Meteor.user()._id);
   },
   'click #declare_victory': function(event, template) {
-    Meteor.call('declare_victory', template.data.game._id, Meteor.user()._id); 
+    Meteor.call('declare_victory', template.data.game._id, Meteor.user()._id);
   }
 });
 
@@ -80,34 +85,33 @@ Template.PLAY_PROFESSION.events({
   }
 })
 
-UI.registerHelper('did_i_win', function(my_assoc) {
-  var game = Games.findOne()
-  var nominated_team = game.state.meta.nominated_team
-  var declaree_assoc = getPlayer(game.players, game.state.user).assoc
-  // declaration successful
-  if (game.state.meta.res) {
-    // you win if you are on the same team as the person who declared
-    return declaree_assoc === my_assoc
-  } else { // declaration unsuccessrul
-    // you win if you are not on the same team as the declaree
-    return declaree_assoc !== my_assoc
-  }
-});
-
-UI.registerHelper('get_association_name', function(assoc_id) {
-  return ASSOCIATIONS[assoc_id];
-});
-
+/* DECLARE_VICTORY */
 Template.DECLARE_VICTORY.events({
   'click #make_declaration': function(event, template) {
-    nominated_team = $("input:radio[name=nominated_team]").val();
-    nominated_player_ids = [];
+    nominatedTeam = $("input:checked[name=nominated_team]").val();
+    nominatedPlayerIds = [];
     $("input:checked[name=nominated_player]").each(function() {
-      nominated_player_ids.push($(this).val());
+      nominatedPlayerIds.push($(this).val());
     });
-    console.log(nominated_player_ids);
-    Meteor.call('finish_declare_victory', template.data.game._id, Meteor.user()._id, nominated_team, nominated_player_ids);
-    console.log(Games.findOne())
+    Meteor.call('finish_declare_victory', template.data.game._id, Meteor.user()._id, nominatedTeam, nominatedPlayerIds);
   }
 
+})
+
+Template.DECLARE_VICTORY.helpers({
+  'nominated_team_radio': function(assoc) {
+    return me.assoc === assoc ? 'checked' : '';
+  },
+
+  'nominated_player_checkbox': function(uid) {
+    return me._id === uid ? 'checked' : '';
+  }
+})
+
+/* FINISH_DECLARE_VICTORY */
+Template.FINISH_DECLARE_VICTORY.helpers({
+  'did_i_win': function() {
+    var winningTeamIds = this.game.state.meta.winningTeamIds;
+    return _.contains(winningTeamIds, me._id);
+  }
 })

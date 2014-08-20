@@ -30,7 +30,7 @@ Meteor.methods({
     Rooms.remove({_id: room_id});
 
     var players = _.map(room.users, function(u, k) {
-      var player = { 
+      var player = {
         _id: u._id,
         turn: k,
         assoc: k % 2,
@@ -137,11 +137,8 @@ Meteor.methods({
         Games.update({_id: game._id}, {$set: { state: game.state }});
 
         var res = getActionById(game.state.action).doAction(game._id);
-        if (res.success === true) {
-          Games.update({_id: game._id}, {$set: {"state.meta": res}});
-        } else {
-          Games.update({_id: game._id}, {$set: {"state.meta": res}});
-        }
+
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
     }
   },
@@ -158,17 +155,39 @@ Meteor.methods({
           wait_on: userId,
           meta: {
             success: false,
-            nominated_team: nominated_team,
-            nominated_player_ids: nominated_player_ids
+            //nominated_team: nominated_team,
+            //nominated_player_ids: nominated_player_ids
           }
         };
 
         Games.update({_id: game._id}, {$set: { state: game.state }});
         var res = getActionById(game.state.action).doAction(game._id, nominated_team, nominated_player_ids);
+
+        // get winning team and losing team
+        var teams = {
+          0: [],
+          1: []
+        }
+        for(var i = 0; i < game.players.length; i++) {
+          var player = game.players[i];
+          teams[player.assoc].push(player._id);
+        }
+
+        var winningTeam;
+        var declaree_assoc = getPlayer(game.players, userId).assoc;
+
+        if (res) {
+          winningTeam = declaree_assoc;
+        }
+        else {
+          winningTeam = declaree_assoc ^ 1; // flip bit
+        }
+
         var meta = {
           res: res,
           nominated_team: nominated_team,
-          nominated_player_ids: nominated_player_ids
+          nominated_player_ids: nominated_player_ids,
+          winningTeamIds: teams[winningTeam],
         };
         Games.update({_id: game._id}, {$set: {"state.meta": meta}});
       }
