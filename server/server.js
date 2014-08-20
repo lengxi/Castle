@@ -46,7 +46,7 @@ Meteor.methods({
     var game = {
       players: players,
       state: {
-        action: Engine.TURN_START._id,
+        action: Game.TURN_START._id,
         user: user._id,
         wait_on: user._id,
         meta: {}
@@ -64,12 +64,12 @@ Meteor.methods({
         var next = game.state.meta.next_state;
         // do whatever needs to be done before we transition
         if (next.meta.hasOwnProperty('callback')) {
-          ENGINE[next.meta.callback.type].callback(next.meta.callback.data);
+          getActionById(next.meta.callback.type).callback(next.meta.callback.data);
         }
 
         // transition to next state
         switch(next.action) {
-          case Engine.TURN_START._id: 
+          case Game.TURN_START._id: 
             game.state = {
               action: next.action,
               user: next.user,
@@ -78,10 +78,10 @@ Meteor.methods({
             }
             Games.update({_id: game_id}, {$set: { state: game.state }});
             break;
-          case Engine.PLAY_PROFESSION._id:
+          case Game.PLAY_PROFESSION._id:
             this.play_profession(game_id, userId);
             break;
-          case Engine.FREE_RESPONSE._id:
+          case Game.FREE_RESPONSE._id:
             this.free_response(game_id, userId);
           default:
         }
@@ -91,12 +91,12 @@ Meteor.methods({
   play_profession: function(game_id, userId) {
     var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
-      if ((game.state.action === Engine.TURN_START._id ||
-           game.state.action === Engine.FREE_STATE._id ) &&
+      if ((game.state.action === Game.TURN_START._id ||
+           game.state.action === Game.FREE_STATE._id ) &&
           game.state.wait_on === userId) {
 
         game.state = {
-            action: Engine.PLAY_PROFESSION._id,
+            action: Game.PLAY_PROFESSION._id,
             user: userId,
             wait_on: userId,
             meta: {
@@ -107,7 +107,7 @@ Meteor.methods({
 
         Games.update({_id: game._id}, {$set: { state: game.state }});
 
-        var res = ENGINE[game.state.action].doAction(game._id);
+        var res = getActionById(game.state.action).doAction(game._id);
         if (res.success === true) {
           Games.update({_id: game._id}, {$set: {"state.meta": res}});
         } else {
@@ -124,9 +124,9 @@ Meteor.methods({
   declare_victory: function(game_id, userId) {
     var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
-      if (game.state.action === Engine.TURN_START._id && game.state.wait_on === userId) {
+      if (game.state.action === Game.TURN_START._id && game.state.wait_on === userId) {
         game.state = {
-          action: Engine.DECLARE_VICTORY._id,
+          action: Game.DECLARE_VICTORY._id,
           user: userId,
           wait_on: userId,
           meta: {
@@ -136,7 +136,7 @@ Meteor.methods({
 
         Games.update({_id: game._id}, {$set: { state: game.state }});
 
-        var res = ENGINE[game.state.action].doAction(game._id);
+        var res = getActionById(game.state.action).doAction(game._id);
         if (res.success === true) {
           Games.update({_id: game._id}, {$set: {"state.meta": res}});
         } else {
@@ -151,9 +151,9 @@ Meteor.methods({
   finish_declare_victory: function(game_id, userId, nominated_team, nominated_player_ids) {
     var game = Games.findOne({_id: game_id, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
-      if (game.state.action === Engine.DECLARE_VICTORY._id && game.state.wait_on === userId) {
+      if (game.state.action === Game.DECLARE_VICTORY._id && game.state.wait_on === userId) {
         game.state = {
-          action: Engine.FINISH_DECLARE_VICTORY._id,
+          action: Game.FINISH_DECLARE_VICTORY._id,
           user: userId,
           wait_on: userId,
           meta: {
@@ -164,7 +164,7 @@ Meteor.methods({
         };
 
         Games.update({_id: game._id}, {$set: { state: game.state }});
-        var res = ENGINE[game.state.action].doAction(game._id, nominated_team, nominated_player_ids);
+        var res = getActionById(game.state.action).doAction(game._id, nominated_team, nominated_player_ids);
         var meta = {
           res: res,
           nominated_team: nominated_team,

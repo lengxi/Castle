@@ -8,7 +8,7 @@ Handlebars.registerHelper('getDisplayName', function(id) {
   return user.services.github.username;
 });
 Handlebars.registerHelper('getProfessionName', function(id) {
-  return PROF[id].name;
+  return getProfById(id).name;
 });
 
 STATE_TEMPLATES = [];
