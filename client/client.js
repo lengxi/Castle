@@ -61,8 +61,6 @@ Template.action.my_action_template = function() {
   return STATE_TEMPLATES[Games.findOne().state.action];
 };
 
-
-
 UI.registerHelper('is_my_action', function() {
   return Games.findOne().state.wait_on === Meteor.user()._id;
 });
@@ -78,10 +76,10 @@ Template.TURN_START.events({
 
 Template.PLAY_PROFESSION.events({
   'click .play_success': function(event, template) {
-    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
   },
   'click .play_failure': function(event, template) {
-    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
   }
 })
 
@@ -93,25 +91,21 @@ Template.DECLARE_VICTORY.events({
     $("input:checked[name=nominated_player]").each(function() {
       nominatedPlayerIds.push($(this).val());
     });
-    Meteor.call('finish_declare_victory', template.data.game._id, Meteor.user()._id, nominatedTeam, nominatedPlayerIds);
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
+      nominated_team: nominatedTeam, 
+      nominated_player_ids: nominatedPlayerIds});
   }
-
-})
+});
 
 Template.DECLARE_VICTORY.helpers({
   'nominated_team_radio': function(assoc) {
     return me.assoc === assoc ? 'checked' : '';
   },
-
   'nominated_player_checkbox': function(uid) {
     return me._id === uid ? 'checked' : '';
-  }
-})
-
-/* FINISH_DECLARE_VICTORY */
-Template.FINISH_DECLARE_VICTORY.helpers({
+  },
   'did_i_win': function() {
-    var winningTeamIds = this.game.state.meta.winningTeamIds;
+    var winningTeamIds = this.game.state.meta.winning_team_ids;
     return _.contains(winningTeamIds, me._id);
   }
 })
