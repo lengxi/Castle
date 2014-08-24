@@ -15,6 +15,10 @@ Handlebars.registerHelper('get_association_name', function(assoc_id) {
   return ASSOCIATIONS[assoc_id];
 });
 
+Handlebars.registerHelper('getCard', function(cardId) {
+  return getCardById(cardId);
+});
+
 
 STATE_TEMPLATES = [];
 STATE_TEMPLATES[0] = Template.TURN_START;

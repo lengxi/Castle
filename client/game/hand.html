@@ -1,3 +1,11 @@
 <template name='hand'>
-hand template
+  <h4>My Hand</h4>
+  {{#each me.cards}}
+    {{#with getCard this.card}}
+      <div class="card">
+        <strong>{{name}}</strong>
+        <p>{{desc}}</p>
+      </div>
+    {{/with}}
+  {{/each}}
 </template>
