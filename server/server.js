@@ -17,11 +17,16 @@ Meteor.publish("games", function () {
 
 //HELPER FUNCTIONS
 function doTransition(gameId, newState, userId, waitOn, meta) {
+  var newMeta = Games.findOne({_id: gameId}).state.meta;
+  for (var attr in meta) { 
+    newMeta[attr] = meta[attr]; 
+  }
+
   var newState = {
-    action: newState._id,
+    action: newState,
     user: userId,
     wait_on: waitOn,
-    meta: meta
+    meta: newMeta
   };
 
   Games.update({_id: gameId}, {$set: { state: newState }});
@@ -71,6 +76,7 @@ Meteor.methods({
 
     return true;
   },
+
   handle_callback: function(gameId, userId, extraData) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
@@ -80,48 +86,57 @@ Meteor.methods({
         if (next.meta.hasOwnProperty('callback')) {
           getActionById(next.meta.callback.type).callback(
             next.meta.callback.data, extraData);
+          delete next.meta.callback;
         }
 
         // transition to next state
+
         switch(next.action) {
-          case Game.TURN_START._id: 
-            game.state = {
-              action: next.action,
-              user: next.user,
-              wait_on: next.user,
-              meta: {}
-            }
-            Games.update({_id: gameId}, {$set: { state: game.state }});
+          case Game.TURN_START._id:
+            doTransition(gameId, next.action, next.user, next.wait_on, next.meta);
             break;
           case Game.PLAY_PROFESSION._id:
-            this.play_profession(gameId, userId);
+            //shouldnt be here, no reason to transition into a user chosen state
             break;
           case Game.FREE_RESPONSE._id:
-            this.free_response(gameId, userId);
+            Games.update({_id: gameId}, {$set: { state: next }});
+            if (next.meta.start_turn !== getPlayer(game.players, userId).turn) {  
+              var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
+              Games.update({_id: gameId}, {$set: {state: res}});
+            }
+            break;
           case Game.DECLARE_VICTORY._id:
+            //already handled by the callback
+            break;
           default:
         }
       }
     }
   },
+
   play_profession: function(gameId, userId) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
-      if ((game.state.action === Game.TURN_START._id ||
-           game.state.action === Game.FREE_STATE._id ) &&
-          game.state.wait_on === userId) {
+      if (game.state.wait_on === userId) {
 
-        game.state = doTransition(gameId, Game.PLAY_PROFESSION,
-          userId, userId, { success: false,
-              prof_id: getPlayer(game.players, userId).prof });
+        game.state = doTransition(gameId, Game.PLAY_PROFESSION._id,
+          userId, userId, { success: false });
 
-        var res = getActionById(game.state.action).doAction(game._id);
+        var res = getActionById(game.state.action).doAction(game._id, userId);
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
     }
   },
+
   free_response: function(gameId, userId) {
-    
+    // this call is just to pass turn on free response
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId) {
+          var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
+          Games.update({_id: gameId}, {$set: {state: res}});
+      }
+    }
   },
 
   // changes game state to declare victory
@@ -131,11 +146,11 @@ Meteor.methods({
       if (game.state.action === Game.TURN_START._id && 
         game.state.wait_on === userId) {
 
-        game.state = doTransition(gameId, Game.DECLARE_VICTORY,
+        game.state = doTransition(gameId, Game.DECLARE_VICTORY._id,
           userId, userId, { success: false });
 
-        var res = getActionById(game.state.action).doAction(game._id);
-        Games.update({_id: game._id}, {$set: {"state.meta": res}});
+        var res = getActionById(game.state.action).doAction(gameId);
+        Games.update({_id: gameId}, {$set: {"state.meta": res}});
       }
     }
   },

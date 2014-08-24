@@ -15,7 +15,7 @@
 <template name="PLAY_PROFESSION">
   {{#if is_my_action}}
     {{#if game.state.meta.success}}
-      <h4>You have chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
+      <h4>You have chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
       <input class="btn btn-success play_success" type="button" value="Next" />
     {{else}}
       <h4>Trying to play profession...Did not succeed.</h4>
@@ -23,10 +23,21 @@
     {{/if}} 
   {{else}}
     {{#if game.state.meta.success}}
-      <h4>{{getDisplayName game.state.user}} has chosen to play {{getProfessionName game.state.meta.prof_id}}!</h4>
+      <h4>{{getDisplayName game.state.user}} has chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
     {{else}}
       <h4>{{getDisplayName game.state.user}} tried to play profession...Did not succeed.</h4>
     {{/if}} 
+  {{/if}}
+</template>
+
+<template name="FREE_RESPONSE">
+  {{#if is_my_action}}
+    <h4>Your chance to respond! Choose an action: </h4>
+    <input class="btn btn-success" id="play_profession" type="button" value="Play Profession" />
+    <input class="btn btn-success" id="play_card" type="button" value="Play Card" />
+    <input class="btn btn-failure" id="do_nothing" type="button" value="Do Nothing" />
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.wait_on}} to choose a response.</h4>
   {{/if}}
 </template>
 

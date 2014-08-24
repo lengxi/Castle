@@ -65,6 +65,9 @@ UI.registerHelper('is_my_action', function() {
   return Games.findOne().state.wait_on === Meteor.user()._id;
 });
 
+/**************/
+/* TURN START */
+/**************/
 Template.TURN_START.events({
   'click #play_profession': function(event, template) {
     Meteor.call('play_profession', template.data.game._id, Meteor.user()._id);
@@ -74,6 +77,9 @@ Template.TURN_START.events({
   }
 });
 
+/*******************/
+/* PLAY PROFESSION */
+/*******************/
 Template.PLAY_PROFESSION.events({
   'click .play_success': function(event, template) {
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
@@ -81,9 +87,26 @@ Template.PLAY_PROFESSION.events({
   'click .play_failure': function(event, template) {
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
   }
-})
+});
 
+/*****************/
+/* FREE RESPONSE */
+/*****************/
+Template.FREE_RESPONSE.events({
+  'click #play_profession': function(event, template) {
+    Meteor.call('play_profession', template.data.game._id, Meteor.user()._id);
+  },
+  'click #play_card': function(event, template) {
+    Meteor.call('play_card', template.data.game._id, Meteor.user()._id);
+  },
+  'click #do_nothing': function(event, template) {
+    Meteor.call('free_response', template.data.game._id, Meteor.user()._id);
+  }
+});
+
+/*******************/
 /* DECLARE_VICTORY */
+/*******************/
 Template.DECLARE_VICTORY.events({
   'click #make_declaration': function(event, template) {
     nominatedTeam = $("input:checked[name=nominated_team]").val();
