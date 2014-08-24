@@ -47,8 +47,16 @@
       <b>{{getDisplayName game.state.user}}</b> declared victory for <b>team</b>:
     {{get_association_name game.state.meta.nominated_team}}
     with <b>teammates</b>:
+    </div>
+    <div>
     {{#each game.state.meta.nominated_player_ids}}
       {{getDisplayName this}}
+      <ul>
+        {{#each getPlayerCardNames this}}
+          <li>{{ this }}</li> 
+        {{/each}}
+
+      </ul>
     {{/each}}
     </div>
 

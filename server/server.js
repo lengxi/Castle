@@ -33,6 +33,28 @@ function doTransition(gameId, newState, userId, waitOn, meta) {
   return newState;
 }
 
+// returns array of array
+// hand for each player position
+// TODO dont' hard code
+function dealCards(num_players) {
+  var hands = []
+  for (var i = 0; i < num_players; i++) {
+    if (i % 2 === 0) {
+      hands.push([
+        {card: Cards.MOCK._id, card_state: 0},
+        {card: Cards.KEY._id, card_state: 0}
+      ]);
+    } else {
+      hands.push([
+        {card: Cards.MOCK._id, card_state: 0},
+        {card: Cards.GOBLET._id, card_state: 0}
+      ]);
+    }
+  }
+
+  return hands;
+}
+
 Meteor.methods({
   create_room: function(newUser) {
     if (Rooms.find({creator: newUser._id}).count() < 1) {
@@ -48,6 +70,7 @@ Meteor.methods({
     var room = Rooms.findOne({_id: roomId});
     Rooms.remove({_id: roomId});
 
+    var all_hands = dealCards(room.users.length);
     var players = _.map(room.users, function(u, k) {
       var player = {
         _id: u._id,
@@ -55,9 +78,7 @@ Meteor.methods({
         assoc: k % 2,
         prof: Professions.MOCK._id,
         prof_state: 0,
-        cards: [ {card: Cards.MOCK._id, card_state: 0},
-                 {card: Cards.MOCK._id, card_state: 0},
-                 {card: Cards.MOCK._id, card_state: 0}]
+        cards: all_hands[k]
       };
       return player;
     });

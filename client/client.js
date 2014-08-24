@@ -19,6 +19,14 @@ Handlebars.registerHelper('getCard', function(cardId) {
   return getCardById(cardId);
 });
 
+Handlebars.registerHelper('getPlayerCardNames', function(user_id) {
+  var player = getPlayer(game.players, user_id); 
+  var card_ids = _.pluck(player.cards, 'card');
+  return _.map(card_ids, function(id) {
+    return getCardById(id).name;
+  });
+});
+
 
 STATE_TEMPLATES = [];
 STATE_TEMPLATES[0] = Template.TURN_START;
