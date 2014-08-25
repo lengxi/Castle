@@ -37,15 +37,18 @@ function doTransition(gameId, newState, userId, waitOn, meta) {
 // hand for each player position
 // TODO dont' hard code
 function dealCards(num_players) {
-  var hands = []
+  var hands = [];
   for (var i = 0; i < num_players; i++) {
     if (i % 2 === 0) {
       hands.push([
+        {card: Cards.MOCK._id, card_state: 0},
+        {card: Cards.MOCK._id, card_state: 0},
         {card: Cards.MOCK._id, card_state: 0},
         {card: Cards.KEY._id, card_state: 0}
       ]);
     } else {
       hands.push([
+        {card: Cards.MOCK._id, card_state: 0},
         {card: Cards.MOCK._id, card_state: 0},
         {card: Cards.GOBLET._id, card_state: 0}
       ]);
@@ -104,14 +107,16 @@ Meteor.methods({
       if (game.state.meta.hasOwnProperty('next_state')) {
         var next = game.state.meta.next_state;
         // do whatever needs to be done before we transition
+
+        var callbackType = undefined;
         if (next.meta.hasOwnProperty('callback')) {
           getActionById(next.meta.callback.type).callback(
             next.meta.callback.data, extraData);
+          callbackType = next.meta.callback.type;
           delete next.meta.callback;
         }
 
         // transition to next state
-
         switch(next.action) {
           case Game.TURN_START._id:
             doTransition(gameId, next.action, next.user, next.wait_on, next.meta);
@@ -121,15 +126,18 @@ Meteor.methods({
             break;
           case Game.FREE_RESPONSE._id:
             Games.update({_id: gameId}, {$set: { state: next }});
-            if (next.meta.start_turn !== getPlayer(game.players, userId).turn) {  
-              var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
-              Games.update({_id: gameId}, {$set: {state: res}});
-            }
             break;
           case Game.DECLARE_VICTORY._id:
             //already handled by the callback
             break;
           default:
+        }
+
+        if (callbackType != undefined) {
+          if (next.action === Game.FREE_RESPONSE._id) {
+            var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
+            Games.update({_id: gameId}, {$set: {state: res}});
+          }
         }
       }
     }
