@@ -27,6 +27,10 @@ Handlebars.registerHelper('getPlayerCardNames', function(user_id) {
   });
 });
 
+Handlebars.registerHelper('isMe', function(userId) {
+  return userId === Meteor.user()._id;
+});
+
 
 STATE_TEMPLATES = [];
 STATE_TEMPLATES[0] = Template.TURN_START;

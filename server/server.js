@@ -80,7 +80,7 @@ Meteor.methods({
         turn: k,
         assoc: k % 2,
         prof: Professions.MOCK._id,
-        prof_state: 0,
+        prof_state: false,
         cards: all_hands[k]
       };
       return player;
