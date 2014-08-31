@@ -81,7 +81,10 @@ Meteor.methods({
         assoc: k % 2,
         prof: Professions.MOCK._id,
         prof_state: false,
-        cards: all_hands[k]
+        cards: all_hands[k],
+        attacking: false,
+        defending: false,
+        supports: u._id
       };
       return player;
     });
@@ -119,26 +122,35 @@ Meteor.methods({
         // transition to next state
         switch(next.action) {
           case Game.TURN_START._id:
-            doTransition(gameId, next.action, next.user, next.wait_on, next.meta);
+            Games.update({_id: gameId}, {$set: { state: next }});
             break;
           case Game.PLAY_PROFESSION._id:
             //shouldnt be here, no reason to transition into a user chosen state
             break;
           case Game.FREE_RESPONSE._id:
             Games.update({_id: gameId}, {$set: { state: next }});
+            var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
+            Games.update({_id: gameId}, {$set: {state: res}});
             break;
           case Game.DECLARE_VICTORY._id:
             //already handled by the callback
             break;
           default:
         }
+      }
+    }
+  },
 
-        if (callbackType != undefined) {
-          if (next.action === Game.FREE_RESPONSE._id) {
-            var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
-            Games.update({_id: gameId}, {$set: {state: res}});
-          }
-        }
+  begin_combat: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId) {
+
+        game.state = doTransition(gameId, Game.BEGIN_COMBAT._id,
+          userId, userId, { success: false });
+
+        var res = Game.BEGIN_COMBAT.doAction(game._id, userId);
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
     }
   },

@@ -5,6 +5,7 @@
 <template name="TURN_START">
   {{#if is_my_action}}
     <h4>It's your turn! Choose an action: </h4>
+    <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
   {{else}}
@@ -32,13 +33,37 @@
 
 <template name="FREE_RESPONSE">
   {{#if is_my_action}}
-    <h4>Your chance to respond! Choose an action: </h4>
+    <h4>Your chance to play a profession or a card! Choose an action: </h4>
     <input class="btn btn-success" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="play_card" type="button" value="Play Card" />
     <input class="btn btn-failure" id="do_nothing" type="button" value="Do Nothing" />
   {{else}}
-    <h4>Waiting on {{getDisplayName game.state.wait_on}} to choose a response.</h4>
+    <h4>Waiting on {{getDisplayName game.state.wait_on}} to play something.</h4>
   {{/if}}
+</template>
+
+<template name="BEGIN_COMBAT">
+{{#if is_my_action}}
+  <h4>Choose someone to attack!</h4>
+  <div>
+  {{#each game.players}}
+    {{#if isMe _id}}
+    {{else}}
+      <label class="radio-inline">
+        <input type="radio" name="target" value="{{_id}}" >
+        {{getDisplayName _id}}
+      </label>
+    {{/if}}
+  {{/each}}
+  </div><br />
+  <input class="btn btn-success" id="choose_attack" type="button" value="Declare Attack" />
+{{else}}
+  <h4>Waiting on {{getDisplayName game.state.wait_on}} to choose who to attack.</h4>
+{{/if}}
+</template>
+
+<template name="DECLARE_SUPPORT">
+declare support placeholder
 </template>
 
 <template name="DECLARE_VICTORY">

@@ -27,8 +27,26 @@ Handlebars.registerHelper('getPlayerCardNames', function(user_id) {
   });
 });
 
+Handlebars.registerHelper('isInCombat', function() {
+  var helper = function(action) {
+    return action === Game.BEGIN_COMBAT._id;
+  };
+
+  var state = Games.findOne().state;
+  return helper(state.action) ||
+    (state.action === Game.FREE_RESPONSE._id && helper(state.meta.type));
+});
+
 Handlebars.registerHelper('isMe', function(userId) {
   return userId === Meteor.user()._id;
+});
+
+Handlebars.registerHelper('hasSupport', function(player) {
+  return player._id !== player.supports;
+});
+
+Handlebars.registerHelper('isPlayersTurn', function(player) {
+  return player._id === Games.findOne().state.user;
 });
 
 
@@ -37,7 +55,8 @@ STATE_TEMPLATES[0] = Template.TURN_START;
 STATE_TEMPLATES[1] = Template.PLAY_PROFESSION;
 STATE_TEMPLATES[2] = Template.FREE_RESPONSE;
 STATE_TEMPLATES[3] = Template.DECLARE_VICTORY;
-STATE_TEMPLATES[4] = Template.FINISH_DECLARE_VICTORY;
+STATE_TEMPLATES[4] = Template.BEGIN_COMBAT;
+STATE_TEMPLATES[5] = Template.DECLARE_SUPPORT;
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -90,6 +109,20 @@ Template.TURN_START.events({
   },
   'click #declare_victory': function(event, template) {
     Meteor.call('declare_victory', template.data.game._id, Meteor.user()._id);
+  },
+  'click #begin_combat': function(event, template) {
+    Meteor.call('begin_combat', template.data.game._id, Meteor.user()._id);
+  }
+});
+
+/****************/
+/* BEGIN COMBAT */
+/****************/
+Template.BEGIN_COMBAT.events({
+  'click #choose_attack': function(event, template) {
+    var target = $("input:checked[name=target]").val();
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
+      target: target});
   }
 });
 

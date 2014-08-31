@@ -96,6 +96,10 @@ body {
           border-radius: 5px;
 }
 
+.table .currentTurn {
+  background-color: #90EE90;
+}
+
 .feed {
 	background-color: #fff;
 	padding: 5px;

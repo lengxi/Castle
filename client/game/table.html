@@ -1,20 +1,33 @@
 <template name='table'>
   <h4>Players</h4>
   {{#each game.players}}
-    <div class="row player">
-      <span><strong>{{getDisplayName _id}} ({{turn}})</strong> -- Num Cards: {{cards.length}}</span>
-      <p>Profession: 
+    <div class="row player {{#if isPlayersTurn this}} currentTurn {{/if}}">
+      <span><strong>{{getDisplayName _id}} ({{turn}})</strong> -- Num Cards: {{cards.length}}</span><br/>
+      <span>Profession: 
       {{#if isMe _id}}
       	{{getProfessionName prof}} 
+        {{#if prof_state}} 
+          (Played)
+        {{/if}}
       {{else}}
       	{{#if prof_state}} 
-      		{{getProfessionName prof}} 
+      		{{getProfessionName prof}} (Played)
       	{{else}} 
       		Unknown
       	{{/if}}
       {{/if}}
-      </p>
-      <span>Supports: placeholder</span>
+      </span><br />
+      {{#if isInCombat}}
+        {{#if attacking}}
+          <strong>Attacking</strong>
+        {{else}} {{#if defending}}
+          <strong>Defending</strong>
+          {{/if}}
+        {{/if}}
+        {{#if hasSupport this}}
+          <span>Supports: {{getDisplayName supports}}</span>
+        {{/if}}
+      {{/if}}
     </div>
   {{/each}}
 </template>
