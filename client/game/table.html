@@ -17,17 +17,15 @@
       	{{/if}}
       {{/if}}
       </span><br />
-      {{#if isInCombat}}
-        {{#if attacking}}
-          <strong>Attacking</strong>
-        {{else}} {{#if defending}}
-          <strong>Defending</strong>
-          {{/if}}
-        {{/if}}
-        {{#if hasSupport this}}
-          <span>Supports: {{getDisplayName supports}}</span>
-        {{/if}}
-      {{/if}}
+	    {{#if attacking}}
+	      <strong>Attacking</strong>
+	    {{else}} {{#if defending}}
+	      <strong>Defending</strong>
+	      {{/if}}
+	    {{/if}}
+	    {{#if hasSupport this}}
+	      <span>Supports: {{getDisplayName supports}}</span>
+	    {{/if}}
     </div>
   {{/each}}
 </template>

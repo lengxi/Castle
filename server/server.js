@@ -161,7 +161,7 @@ Meteor.methods({
       if (game.state.wait_on === userId) {
 
         game.state = doTransition(gameId, Game.PLAY_PROFESSION._id,
-          userId, userId, { success: false });
+          game.state.user, userId, { success: false });
 
         var res = getActionById(game.state.action).doAction(game._id, userId);
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
