@@ -89,12 +89,18 @@ Deps.autorun(function(c) {
   if (Games.find().fetch().length > 0) {
     Router.go('game');
     c.stop();
-  }
+  } 
 });
 
 Template.action.my_action_template = function() {
   return STATE_TEMPLATES[Games.findOne().state.action];
 };
+
+Template.game_layout.events({
+  'click #clear_game': function(event, template) {
+    Meteor.call('clear_game', template.data.game._id, Meteor.user()._id);
+  }
+});
 
 UI.registerHelper('is_my_action', function() {
   return Games.findOne().state.wait_on === Meteor.user()._id;
@@ -123,6 +129,20 @@ Template.BEGIN_COMBAT.events({
     var target = $("input:checked[name=target]").val();
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
       target: target});
+  }
+});
+
+/*******************/
+/* DECLARE SUPPORT */
+/*******************/
+Template.DECLARE_SUPPORT.events({
+  'click #choose_support': function(event, template) {
+    var support = $("input:checked[name=support]").val();
+    Meteor.call('declare_support', template.data.game._id, Meteor.user()._id,
+      support);
+  },
+  'click #support_success': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
   }
 });
 

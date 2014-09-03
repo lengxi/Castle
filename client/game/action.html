@@ -63,7 +63,39 @@
 </template>
 
 <template name="DECLARE_SUPPORT">
-declare support placeholder
+{{#if is_my_action}}
+  {{#if game.state.meta.success}}
+    <h4>You have chosen to support {{getDisplayName game.state.meta.supports}}!</h4>
+    <input class="btn btn-success" id="support_success" type="button" value="Next" />
+  {{else}}
+  <h4>Choose who to support!</h4>
+  <div>
+  {{#each game.players}}
+    {{#if attacking}}
+      <label class="radio-inline">
+        <input type="radio" name="support" value="{{_id}}" >
+        {{getDisplayName _id}} (Attacking)
+      </label>
+    {{else}}
+      {{#if defending}}
+      <label class="radio-inline">
+        <input type="radio" name="support" value="{{_id}}" >
+        {{getDisplayName _id}} (Defending)
+      </label>
+      {{/if}}
+    {{/if}}
+  {{/each}}
+  </div><br />
+  <input class="btn btn-success" id="choose_support" type="button" value="Declare Support" />
+  {{/if}}
+{{else}}
+  {{#if game.state.meta.success}}
+    <h4>{{getDisplayName game.state.wait_on}} supports 
+    {{getDisplayName game.state.meta.supports}}!</h4>
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.wait_on}} to choose who to support.</h4>
+  {{/if}}
+{{/if}}
 </template>
 
 <template name="DECLARE_VICTORY">

@@ -4,6 +4,12 @@ body {
 	background-color: #eee;
 }
 
+.clear-games-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 /* The white background content wrapper */
 .room_content {
 	background-color: #fff;

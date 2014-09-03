@@ -104,6 +104,13 @@ Meteor.methods({
     return true;
   },
 
+  clear_game: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      Games.remove({_id: gameId});
+    }
+  },
+
   handle_callback: function(gameId, userId, extraData) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
@@ -126,6 +133,9 @@ Meteor.methods({
             break;
           case Game.PLAY_PROFESSION._id:
             //shouldnt be here, no reason to transition into a user chosen state
+            break;
+          case Game.DECLARE_SUPPORT._id:
+            Games.update({_id: gameId}, {$set: { state: next }});
             break;
           case Game.FREE_RESPONSE._id:
             Games.update({_id: gameId}, {$set: { state: next }});
@@ -155,6 +165,20 @@ Meteor.methods({
     }
   },
 
+  declare_support: function(gameId, userId, support) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId && game.state.action === Game.DECLARE_SUPPORT._id) {
+
+        game.state = doTransition(gameId, Game.DECLARE_SUPPORT._id,
+          game.state.user, game.state.wait_on, { success: false });
+
+        var res = Game.DECLARE_SUPPORT.doAction(game._id, userId, support);
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
+      }
+    }
+  },
+
   play_profession: function(gameId, userId) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
@@ -174,8 +198,13 @@ Meteor.methods({
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
       if (game.state.wait_on === userId) {
-          var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
-          Games.update({_id: gameId}, {$set: {state: res}});
+
+        game.state = doTransition(gameId, Game.FREE_RESPONSE._id,
+          game.state.user, getNextPlayer(game.players, game.state.wait_on)._id, 
+          game.state.meta);
+
+        var res = Game.FREE_RESPONSE.doAction(gameId, userId); 
+        Games.update({_id: gameId}, {$set: {state: res}});
       }
     }
   },
