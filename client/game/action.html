@@ -8,6 +8,7 @@
     <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
+    <input class="btn btn-success" id="trade" type="button" value="Trade" />
   {{else}}
     <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
   {{/if}}
@@ -254,3 +255,39 @@
     {{/if}}
   {{/if}}
 </template>
+
+<template name="TRADE">
+  {{#if is_my_action}}
+  <div class="form-group">
+    <h4><b>Select a player to trade with: </b></h4>
+    <div>
+      {{#each game.players}}
+        {{#unless isMe this._id}}
+        <label><input type="radio" name="trade_player" value="{{this._id}}" checked>
+          {{getDisplayName this._id}}
+        </label>
+        {{/unless}}
+      {{/each}}
+
+      <h4><b>Select a card to trade:</b></h4>
+      <div>
+        {{#each me.cards}}
+          {{#with getCard this.card}}
+          <label><input type="radio" name="trade_card" value="{{this._id}}" checked>
+            {{this.name}}
+          </label>
+          {{/with}}
+        {{/each}}
+      </div>
+      <div>
+        <input class="btn btn-success" id="make_trade" type="button" value="Make Trade" />
+        <input class="btn btn-failure" type="button" value="Go back" />
+      </div>
+    </div>
+  </div>
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.wait_on}} to make a trade.</h4>
+  {{/if}}
+</template>
+
+

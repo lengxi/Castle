@@ -151,6 +151,8 @@ Meteor.methods({
             break;
           case Game.STEAL_CARD._id:
             Games.update({_id: gameId}, {$set: { state: next }});
+          case Game.TRADE._id:
+            // TODO go back to turn start?
             break;
           default:
         }
@@ -276,6 +278,22 @@ Meteor.methods({
       }
     }
   },
+
+  trade: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.action === Game.TURN_START._id &&
+        game.state.wait_on === userId) {
+
+        game.state = doTransition(gameId, Game.TRADE._id,
+          userId, userId, { success: false });
+
+        var res = getActionById(game.state.action).doAction(gameId);
+        Game.update({_id: gameId}, {$set: {"state.meta": res}});
+      }
+    }
+
+  }
 
 });
 

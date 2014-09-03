@@ -1,0 +1,18 @@
+<template name='special_effect'>
+<button class="btn btn-primary" data-toggle="modal"
+data-target="#my_modal">Test button</button>
+
+<div class="modal fade bs-example-modal-lg" id="my_modal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      {{> SPECIAL_EFFECT_MOCK}}
+    </div>
+  </div>
+</div>
+</template>
+
+<!-- PUT EFFECT TEMPLATES HERE FOR EACH ITEM -->
+<template name='SPECIAL_EFFECT_MOCK'>
+Mock special effect
+</template>

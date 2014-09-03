@@ -61,7 +61,7 @@ STATE_TEMPLATES[6] = Template.RESOLVE_COMBAT;
 STATE_TEMPLATES[7] = Template.POST_COMBAT;
 STATE_TEMPLATES[8] = Template.STEAL_CARD;
 STATE_TEMPLATES[9] = Template.STEAL_INFO;
-
+STATE_TEMPLATES[10] = Template.TRADE;
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -121,6 +121,7 @@ Template.TURN_START.events({
   'click #declare_victory': function(event, template) {
     Meteor.call('declare_victory', template.data.game._id, Meteor.user()._id);
   },
+<<<<<<< HEAD
   'click #begin_combat': function(event, template) {
     Meteor.call('begin_combat', template.data.game._id, Meteor.user()._id);
   }
@@ -234,8 +235,8 @@ Template.FREE_RESPONSE.events({
 /*******************/
 Template.DECLARE_VICTORY.events({
   'click #make_declaration': function(event, template) {
-    nominatedTeam = $("input:checked[name=nominated_team]").val();
-    nominatedPlayerIds = [];
+    var nominatedTeam = $("input:checked[name=nominated_team]").val();
+    var nominatedPlayerIds = [];
     $("input:checked[name=nominated_player]").each(function() {
       nominatedPlayerIds.push($(this).val());
     });
@@ -256,4 +257,19 @@ Template.DECLARE_VICTORY.helpers({
     var winningTeamIds = this.game.state.meta.winning_team_ids;
     return _.contains(winningTeamIds, me._id);
   }
+})
+
+/*********/
+/* TRADE */
+/*********/
+Template.TRADE.events({
+  'click #make_trade': function(event, template) {
+    var trade_player = $("input:checked[name=trade_player]").val(); 
+    var trade_card = $("input:checked[name=trade_card]").val(); 
+  }
+
+  Meteor.call('handle_callback', template.data.game_.id, Meteor.user()._id),{
+      trade_player: trade_player,
+      trade_card: trade_card
+  });
 })
