@@ -98,6 +98,19 @@
 {{/if}}
 </template>
 
+<template name="RESOLVE_COMBAT">
+{{#if game.state.meta.success}}
+  
+{{else}}
+  {{#if is_my_action}}
+    <h4>Time to see who won the struggle!</h4>
+    <input class="btn btn-success" type="button" id="resolve_combat" value="Next" />
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.user}} to begin combat resolution.</h4>
+  {{/if}}
+{{/if}}
+</template>
+
 <template name="DECLARE_VICTORY">
   {{#if game.state.meta.success}}
     <div>

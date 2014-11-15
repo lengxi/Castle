@@ -96,7 +96,8 @@ Meteor.methods({
         user: user._id,
         wait_on: user._id,
         meta: {}
-      }
+      },
+      hooks: []
     };
 
     Games.insert(game);
@@ -175,6 +176,19 @@ Meteor.methods({
 
         var res = Game.DECLARE_SUPPORT.doAction(game._id, userId, support);
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
+      }
+    }
+  },
+
+  resolve_combat: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId && game.state.action === Game.RESOLVE_COMBAT._id) {
+
+        var res = Game.RESOLVE_COMBAT.doAction(game._id, userId);
+
+        game.state = doTransition(gameId, Game.RESOLVE_COMBAT._id,
+          game.state.user, game.state.wait_on, res);
       }
     }
   },
