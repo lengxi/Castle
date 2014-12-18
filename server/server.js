@@ -135,6 +135,9 @@ Meteor.methods({
           case Game.PLAY_PROFESSION._id:
             //shouldnt be here, no reason to transition into a user chosen state
             break;
+          case Game.POST_COMBAT._id:
+            Games.update({_id: gameId}, {$set: { state: next }});
+            break;
           case Game.DECLARE_SUPPORT._id:
             Games.update({_id: gameId}, {$set: { state: next }});
             break;

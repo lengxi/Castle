@@ -58,6 +58,7 @@ STATE_TEMPLATES[3] = Template.DECLARE_VICTORY;
 STATE_TEMPLATES[4] = Template.BEGIN_COMBAT;
 STATE_TEMPLATES[5] = Template.DECLARE_SUPPORT;
 STATE_TEMPLATES[6] = Template.RESOLVE_COMBAT;
+STATE_TEMPLATES[7] = Template.POST_COMBAT;
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -153,8 +154,15 @@ Template.DECLARE_SUPPORT.events({
 Template.RESOLVE_COMBAT.events({
   'click #resolve_combat': function(event, template) {
     Meteor.call('resolve_combat', template.data.game._id, Meteor.user()._id);
+  },
+  'click #post_combat': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
   }
 });
+
+/***************/
+/* POST COMBAT */
+/***************/
 
 /*******************/
 /* PLAY PROFESSION */

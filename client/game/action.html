@@ -100,15 +100,31 @@
 
 <template name="RESOLVE_COMBAT">
 {{#if game.state.meta.success}}
-  
+  {{#if game.state.meta.is_draw}}
+    <h4>The struggle was a draw!</h4>
+  {{else}}
+    <h4>
+    {{#if isMe game.state.meta.winner}}
+      You won the struggle, 
+    {{else}}
+      {{getDisplayName game.state.meta.winner}} won the struggle,
+    {{/if}}
+    with a score of {{game.state.meta.winner_score}} to {{game.state.meta.loser_score}}.
+    </h4>
+  {{/if}}
+  <input class="btn btn-success" type="button" id="post_combat" value="Next" />
 {{else}}
   {{#if is_my_action}}
     <h4>Time to see who won the struggle!</h4>
     <input class="btn btn-success" type="button" id="resolve_combat" value="Next" />
   {{else}}
-    <h4>Waiting on {{getDisplayName game.state.user}} to begin combat resolution.</h4>
+    <h4>Waiting on {{getDisplayName game.state.user}} to move on to see who won.</h4>
   {{/if}}
 {{/if}}
+</template>
+
+<template name="POST_COMBAT">
+POST COMBAT REACHED
 </template>
 
 <template name="DECLARE_VICTORY">
