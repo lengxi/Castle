@@ -124,7 +124,38 @@
 </template>
 
 <template name="POST_COMBAT">
-POST COMBAT REACHED
+  {{#if is_my_action}}
+    {{#if game.state.meta.is_draw}}
+      <h4>Both you and {{getDisplayName game.state.meta.loser}} draw a card as the struggle ended in a draw.</h4>
+      <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
+    {{else}}
+      <h4>You may choose to either pick a card from {{getDisplayName game.state.meta.loser}}'s' hand to take for yourself, or find out their association and profession.</h4>
+      <input class="btn btn-success" type="button" id="choose_card" value="Cards" />
+      <input class="btn btn-success" type="button" id="choose_info" value="Information" />
+    {{/if}}
+  {{else}}
+    {{#if game.state.meta.is_draw}}
+      <h4>Both {{getDisplayName game.state.meta.winner}} and {{getDisplayName game.state.meta.loser}} draw a card as the struggle ended in a draw.</h4>
+    {{else}}
+      <h4>Waiting for the winner of the struggle {{getDisplayName game.state.user}} to decide on their reward.</h4>
+    {{/if}}
+  {{/if}}
+</template>
+
+<template name="STEAL_CARD">
+  {{#if is_my_action}}
+    {{#each game.state.meta.pick_cards}}
+      {{#with getCard this.card}}
+        <label class="radio-inline">
+          <input type="radio" name="steal_card" value="{{_id}}" >
+          {{name}}
+        </label>
+      {{/with}}
+    {{/each}}
+    <input class="btn btn-success" id="pick_card" type="button" value="Take" />
+  {{else}}
+    <h4>Waiting for {{getDisplayName game.state.meta.winner}} to pick a card from {{getDisplayName game.state.meta.loser}}'s hand.</h4>
+  {{/if}}
 </template>
 
 <template name="DECLARE_VICTORY">

@@ -187,11 +187,21 @@ Meteor.methods({
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
       if (game.state.wait_on === userId && game.state.action === Game.RESOLVE_COMBAT._id) {
-
         var res = Game.RESOLVE_COMBAT.doAction(game._id, userId);
-
         game.state = doTransition(gameId, Game.RESOLVE_COMBAT._id,
           game.state.user, game.state.wait_on, res);
+      }
+    }
+  },
+
+  steal_card: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId && game.state.action === Game.POST_COMBAT._id) {
+        var res = Game.STEAL_CARD.doAction(game._id, userId);
+        game.state = doTransition(gameId, Game.STEAL_CARD._id,
+          game.state.user, userId, {});
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
     }
   },

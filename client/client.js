@@ -163,6 +163,27 @@ Template.RESOLVE_COMBAT.events({
 /***************/
 /* POST COMBAT */
 /***************/
+Template.POST_COMBAT.events({
+  'click #finish_combat': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id);
+  },
+  'click #choose_card': function(event, template) {
+    Meteor.call('steal_card', template.data.game._id, Meteor.user()._id);
+  },
+  'click #choose_info': function(event, template) {
+    Meteor.call('steal_info', template.data.game._id, Meteor.user()._id);
+  }
+});
+
+/**************/
+/* STEAL CARD */
+/**************/
+Template.STEAL_CARD.events({
+  'click #pick_card': function(event, template) {
+    var card = $("input:checked[name=steal_card]").val();
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, card);
+  },
+});
 
 /*******************/
 /* PLAY PROFESSION */
