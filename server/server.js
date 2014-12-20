@@ -206,6 +206,16 @@ Meteor.methods({
     }
   },
 
+  end_turn: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId) {
+        var res = Game.END_TURN.doAction(game._id, userId);
+        Games.update({_id: gameId}, {$set: { state: res }});
+      }
+    }
+  },
+
   play_profession: function(gameId, userId) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {

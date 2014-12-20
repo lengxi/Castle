@@ -59,6 +59,8 @@ STATE_TEMPLATES[4] = Template.BEGIN_COMBAT;
 STATE_TEMPLATES[5] = Template.DECLARE_SUPPORT;
 STATE_TEMPLATES[6] = Template.RESOLVE_COMBAT;
 STATE_TEMPLATES[7] = Template.POST_COMBAT;
+STATE_TEMPLATES[8] = Template.STEAL_CARD;
+
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -181,7 +183,8 @@ Template.POST_COMBAT.events({
 Template.STEAL_CARD.events({
   'click #pick_card': function(event, template) {
     var card = $("input:checked[name=steal_card]").val();
-    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, card);
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, 
+      {stolen_card: card});
   },
 });
 

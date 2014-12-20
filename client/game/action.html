@@ -112,7 +112,9 @@
     with a score of {{game.state.meta.winner_score}} to {{game.state.meta.loser_score}}.
     </h4>
   {{/if}}
-  <input class="btn btn-success" type="button" id="post_combat" value="Next" />
+  {{#if is_my_action}}
+    <input class="btn btn-success" type="button" id="post_combat" value="Next" />
+  {{/if}}
 {{else}}
   {{#if is_my_action}}
     <h4>Time to see who won the struggle!</h4>
@@ -144,7 +146,7 @@
 
 <template name="STEAL_CARD">
   {{#if is_my_action}}
-    {{#each game.state.meta.pick_cards}}
+    {{#each game.state.meta.loser_cards}}
       {{#with getCard this.card}}
         <label class="radio-inline">
           <input type="radio" name="steal_card" value="{{_id}}" >
