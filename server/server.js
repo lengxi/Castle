@@ -84,7 +84,7 @@ Meteor.methods({
         cards: all_hands[k],
         attacking: false,
         defending: false,
-        supports: u._id
+        supports: -1
       };
       return player;
     });
@@ -149,6 +149,9 @@ Meteor.methods({
           case Game.DECLARE_VICTORY._id:
             //already handled by the callback
             break;
+          case Game.STEAL_CARD._id:
+            Games.update({_id: gameId}, {$set: { state: next }});
+            break;
           default:
         }
       }
@@ -200,6 +203,18 @@ Meteor.methods({
       if (game.state.wait_on === userId && game.state.action === Game.POST_COMBAT._id) {
         var res = Game.STEAL_CARD.doAction(game._id, userId);
         game.state = doTransition(gameId, Game.STEAL_CARD._id,
+          game.state.user, userId, {});
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
+      }
+    }
+  },
+
+  steal_info: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId && game.state.action === Game.POST_COMBAT._id) {
+        var res = Game.STEAL_INFO.doAction(game._id, userId);
+        game.state = doTransition(gameId, Game.STEAL_INFO._id,
           game.state.user, userId, {});
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }

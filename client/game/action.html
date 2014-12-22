@@ -139,24 +139,51 @@
     {{#if game.state.meta.is_draw}}
       <h4>Both {{getDisplayName game.state.meta.winner}} and {{getDisplayName game.state.meta.loser}} draw a card as the struggle ended in a draw.</h4>
     {{else}}
-      <h4>Waiting for the winner of the struggle {{getDisplayName game.state.user}} to decide on their reward.</h4>
+      <h4>Waiting for the winner {{getDisplayName game.state.meta.winner}} to decide on their reward.</h4>
     {{/if}}
   {{/if}}
 </template>
 
 <template name="STEAL_CARD">
-  {{#if is_my_action}}
-    {{#each game.state.meta.loser_cards}}
-      {{#with getCard this.card}}
-        <label class="radio-inline">
-          <input type="radio" name="steal_card" value="{{_id}}" >
-          {{name}}
-        </label>
-      {{/with}}
-    {{/each}}
-    <input class="btn btn-success" id="pick_card" type="button" value="Take" />
+  {{#if game.state.meta.success}}
+    <h4>A card was successfully taken!</h4>
+    {{#if is_my_action}}
+      <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
+    {{/if}}
   {{else}}
-    <h4>Waiting for {{getDisplayName game.state.meta.winner}} to pick a card from {{getDisplayName game.state.meta.loser}}'s hand.</h4>
+    {{#if is_my_action}}
+      <div class="form-group">
+        <div>
+          <ul class="list-unstyled">
+          {{#each game.state.meta.loser_cards}}
+            {{#with getCard this.card}}
+              <li>
+                <label class="radio-inline">
+                  <input type="radio" name="steal_card" value="{{_id}}" >
+                  {{name}}
+                </label>
+              </li>
+            {{/with}}
+          {{/each}}
+          </ul>
+        </div>
+        <div>
+          <input class="btn btn-success" id="pick_card" type="button" value="Take" />
+        </div>
+      </div>
+    {{else}}
+      <h4>Waiting for {{getDisplayName game.state.meta.winner}} to pick a card from {{getDisplayName game.state.meta.loser}}'s hand.</h4>
+    {{/if}}
+  {{/if}}
+</template>
+
+<template name="STEAL_INFO">
+  {{#if is_my_action}}
+    <h4>{{getDisplayName game.state.meta.loser}}'s association: {{get_association_name game.state.meta.loser_assoc}}</h4>
+    <h4>{{getDisplayName game.state.meta.loser}}'s profession: {{getProfessionName game.state.meta.loser_prof}}</h4>
+    <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
+  {{else}}
+    <h4>Waiting for {{getDisplayName game.state.meta.winner}} to finish looking at {{getDisplayName game.state.meta.loser}}'s association and profession.</h4>
   {{/if}}
 </template>
 

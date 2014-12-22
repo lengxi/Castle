@@ -42,7 +42,7 @@ Handlebars.registerHelper('isMe', function(userId) {
 });
 
 Handlebars.registerHelper('hasSupport', function(player) {
-  return player._id !== player.supports;
+  return player.supports > 0 && player._id !== player.supports;
 });
 
 Handlebars.registerHelper('isPlayersTurn', function(player) {
@@ -60,6 +60,7 @@ STATE_TEMPLATES[5] = Template.DECLARE_SUPPORT;
 STATE_TEMPLATES[6] = Template.RESOLVE_COMBAT;
 STATE_TEMPLATES[7] = Template.POST_COMBAT;
 STATE_TEMPLATES[8] = Template.STEAL_CARD;
+STATE_TEMPLATES[9] = Template.STEAL_INFO;
 
 
 Template.home.hasUser = function () {
@@ -185,6 +186,18 @@ Template.STEAL_CARD.events({
     var card = $("input:checked[name=steal_card]").val();
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, 
       {stolen_card: card});
+  },
+  'click #finish_combat': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id);
+  },
+});
+
+/*************/
+/* STEAL INFO*/
+/*************/
+Template.STEAL_INFO.events({
+  'click #finish_combat': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id);
   },
 });
 
