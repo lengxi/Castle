@@ -19,6 +19,10 @@ Handlebars.registerHelper('getCard', function(cardId) {
   return getCardById(cardId);
 });
 
+Handlebars.registerHelper('getCardName', function(cardId) {
+  return getCardById(cardId).name;
+});
+
 Handlebars.registerHelper('getPlayerCardNames', function(user_id) {
   var player = getPlayer(game.players, user_id); 
   var card_ids = _.pluck(player.cards, 'card');
@@ -49,8 +53,17 @@ Handlebars.registerHelper('isPlayersTurn', function(player) {
   return player._id === Games.findOne().state.user;
 });
 
+Handlebars.registerHelper('playedCards', function(player) {
+  var playedCards = _.filter(player.cards, function(c) {
+    return c.card_state === Cards.PLAYED;
+  });
+  var card_ids = _.pluck(playedCards, 'card');
+  return _.map(card_ids, function(id) {
+    return getCardById(id);
+  });
+});
 
-STATE_TEMPLATES = [];
+STATE_TEMPLATES = {};
 STATE_TEMPLATES[0] = Template.TURN_START;
 STATE_TEMPLATES[1] = Template.PLAY_PROFESSION;
 STATE_TEMPLATES[2] = Template.FREE_RESPONSE;
@@ -61,7 +74,8 @@ STATE_TEMPLATES[6] = Template.RESOLVE_COMBAT;
 STATE_TEMPLATES[7] = Template.POST_COMBAT;
 STATE_TEMPLATES[8] = Template.STEAL_CARD;
 STATE_TEMPLATES[9] = Template.STEAL_INFO;
-
+STATE_TEMPLATES[11] = Template.PLAY_CARD;
+STATE_TEMPLATES[12] = Template.POST_PLAY_CARD;
 
 Template.home.hasUser = function () {
   return Meteor.user() != null;
@@ -213,6 +227,29 @@ Template.PLAY_PROFESSION.events({
   }
 });
 
+/*************/
+/* PLAY CARD */
+/*************/
+Template.PLAY_CARD.events({
+  'click #play_card': function(event, template) {
+    var card = $("input:checked[name=play_card]").val();
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, 
+      {played_card: card});
+  },
+});
+
+/******************/
+/* POST PLAY CARD */
+/******************/
+Template.POST_PLAY_CARD.events({
+  'click .play_success': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
+  },
+  'click .play_failure': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id);
+  }
+});
+
 /*****************/
 /* FREE RESPONSE */
 /*****************/
@@ -227,7 +264,6 @@ Template.FREE_RESPONSE.events({
     Meteor.call('free_response', template.data.game._id, Meteor.user()._id);
   }
 });
-
 
 /*******************/
 /* DECLARE_VICTORY */

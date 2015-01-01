@@ -41,16 +41,16 @@ function dealCards(num_players) {
   for (var i = 0; i < num_players; i++) {
     if (i % 2 === 0) {
       hands.push([
-        {card: Cards.MOCK._id, card_state: 0},
-        {card: Cards.MOCK._id, card_state: 0},
-        {card: Cards.MOCK._id, card_state: 0},
-        {card: Cards.KEY._id, card_state: 0}
+        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
+        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
+        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
+        {card: Cards.KEY._id, card_state: Cards.UNPLAYED}
       ]);
     } else {
       hands.push([
-        {card: Cards.MOCK._id, card_state: 0},
-        {card: Cards.MOCK._id, card_state: 0},
-        {card: Cards.GOBLET._id, card_state: 0}
+        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
+        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
+        {card: Cards.GOBLET._id, card_state: Cards.UNPLAYED}
       ]);
     }
   }
@@ -116,14 +116,20 @@ Meteor.methods({
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
       if (game.state.meta.hasOwnProperty('next_state')) {
-        var next = game.state.meta.next_state;
+        
         // do whatever needs to be done before we transition
-
-        var callbackType = undefined;
+        var next = game.state.meta.next_state;
         if (next.meta.hasOwnProperty('callback')) {
           getActionById(next.meta.callback.type).callback(
             next.meta.callback.data, extraData);
-          callbackType = next.meta.callback.type;
+        }
+
+        // reset as callback might change properties of next_state
+        game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+        next = game.state.meta.next_state;
+
+        // clean up useless callback data
+        if (next.meta.hasOwnProperty('callback')) {
           delete next.meta.callback;
         }
 
@@ -134,6 +140,9 @@ Meteor.methods({
             break;
           case Game.PLAY_PROFESSION._id:
             //shouldnt be here, no reason to transition into a user chosen state
+            break;
+          case Game.POST_PLAY_CARD._id:
+            Games.update({_id: gameId}, {$set: { state: next }});
             break;
           case Game.POST_COMBAT._id:
             Games.update({_id: gameId}, {$set: { state: next }});
@@ -242,6 +251,17 @@ Meteor.methods({
         var res = getActionById(game.state.action).doAction(game._id, userId);
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
+    }
+  },
+
+  play_card: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null && game.state.wait_on === userId) {
+      game.state = doTransition(gameId, Game.PLAY_CARD._id,
+        game.state.user, userId, { success: false });
+      var res = getActionById(game.state.action).doAction(game._id, userId);
+      Games.update({_id: game._id}, {$set: {"state.meta": res}});
+    
     }
   },
 

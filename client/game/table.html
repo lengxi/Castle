@@ -26,6 +26,10 @@
 	    {{#if hasSupport this}}
 	      <span>Supports: {{getDisplayName supports}}</span>
 	    {{/if}}
+      <br />
+      {{#each playedCards this}}
+        [<strong>{{name}}</strong>]
+      {{/each}}
     </div>
   {{/each}}
 </template>

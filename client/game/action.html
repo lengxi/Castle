@@ -24,9 +24,60 @@
     {{/if}} 
   {{else}}
     {{#if game.state.meta.success}}
-      <h4>{{getDisplayName game.state.user}} has chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
+      <h4>{{getDisplayName game.state.wait_on}} has chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
     {{else}}
-      <h4>{{getDisplayName game.state.user}} tried to play profession...Did not succeed.</h4>
+      <h4>{{getDisplayName game.state.wait_on}} tried to play profession...Did not succeed.</h4>
+    {{/if}} 
+  {{/if}}
+</template>
+
+<template name="PLAY_CARD">
+  {{#if is_my_action}}
+    <h4>Pick a card to play</h4>
+    <div class="form-group">
+      <div>
+        <ul class="list-unstyled">
+        {{#each me.cards}}
+          {{#with getCard this.card}}
+            <li>
+              <label class="radio-inline">
+                <input type="radio" name="play_card" value="{{_id}}">
+                {{name}}
+              </label>
+            </li>
+          {{/with}}
+        {{/each}}
+          <li>
+            <label class="radio-inline">
+              <input type="radio" name="play_card" value="-1">
+              Play nothing instead
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <input class="btn btn-success" id="play_card" type="button" value="Play" />
+      </div>
+    </div>
+  {{else}}
+    <h4>Waiting for {{getDisplayName game.state.wait_on}} to play a card.</h4>
+  {{/if}}
+</template>
+
+<template name="POST_PLAY_CARD">
+  {{#if is_my_action}}
+    {{#if game.state.meta.success}}
+      <h4>You played {{getCardName game.state.meta.played_card}}!</h4>
+      <input class="btn btn-success play_success" type="button" value="Next" />
+    {{else}}
+      <h4>You cannot play {{getCardName game.state.meta.played_card}}.</h4>
+      <input class="btn btn-failure play_failure" type="button" value="Go back" />
+    {{/if}} 
+  {{else}}
+    {{#if game.state.meta.success}}
+      <h4>{{getDisplayName game.state.wait_on}} played {{getCardName game.state.meta.played_card}}!</h4>
+    {{else}}
+      <h4>{{getDisplayName game.state.wait_on}} tried to play a card... Did not succeed.</h4>
     {{/if}} 
   {{/if}}
 </template>
