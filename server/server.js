@@ -41,16 +41,16 @@ function dealCards(num_players) {
   for (var i = 0; i < num_players; i++) {
     if (i % 2 === 0) {
       hands.push([
-        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
-        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
-        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
-        {card: Cards.KEY._id, card_state: Cards.UNPLAYED}
+        {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED},
+        {card: Cards.GLOVES._id, card_state: Cards.UNPLAYED},
+        {card: Cards.THROWING_KNIVES._id, card_state: Cards.UNPLAYED},
+        {card: Cards.WHIP._id, card_state: Cards.UNPLAYED}
       ]);
     } else {
       hands.push([
-        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
-        {card: Cards.MOCK._id, card_state: Cards.UNPLAYED},
-        {card: Cards.GOBLET._id, card_state: Cards.UNPLAYED}
+        {card: Cards.POISON_RING._id, card_state: Cards.UNPLAYED},
+        {card: Cards.WHIP._id, card_state: Cards.UNPLAYED},
+        {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED}
       ]);
     }
   }
@@ -79,7 +79,7 @@ Meteor.methods({
         _id: u._id,
         turn: k,
         assoc: k % 2,
-        prof: Professions.MOCK._id,
+        prof: Professions.THUG._id,
         prof_state: false,
         cards: all_hands[k],
         attacking: false,
@@ -261,7 +261,6 @@ Meteor.methods({
         game.state.user, userId, { success: false });
       var res = getActionById(game.state.action).doAction(game._id, userId);
       Games.update({_id: game._id}, {$set: {"state.meta": res}});
-    
     }
   },
 
