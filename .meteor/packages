@@ -4,8 +4,8 @@
 # but you can also edit it by hand.
 
 standard-app-packages
-cmather:iron-router@0.8.2
 accounts-ui
 accounts-github
 mizzao:bootstrap-3
+iron:router
 
