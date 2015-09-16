@@ -45,8 +45,20 @@ Handlebars.registerHelper('isMe', function(userId) {
   return userId === Meteor.user()._id;
 });
 
+Handlebars.registerHelper('isMeProfession', function(professionId) {
+  var player = getPlayer(game.players, Meteor.user()._id);
+  return player.prof === professionId
+    && (player.prof_state === Professions.PLAYED
+      || player.prof_state === Professions.JUST_PLAYED);
+});
+
+Handlebars.registerHelper('isProfRevealed', function(profState) {
+  return profState === Professions.PLAYED
+    || profState === Professions.JUST_PLAYED;
+});
+
 Handlebars.registerHelper('hasSupport', function(player) {
-  return player.supports > 0 && player._id !== player.supports;
+  return player.supports && player._id !== player.supports;
 });
 
 Handlebars.registerHelper('isPlayersTurn', function(player) {
@@ -137,6 +149,9 @@ Template.TURN_START.events({
   },
   'click #begin_combat': function(event, template) {
     Meteor.call('begin_combat', template.data.game._id, Meteor.user()._id);
+  },
+  'click #do_nothing': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id);
   }
 });
 
@@ -146,8 +161,9 @@ Template.TURN_START.events({
 Template.BEGIN_COMBAT.events({
   'click #choose_attack': function(event, template) {
     var target = $("input:checked[name=target]").val();
+    var hypnotizedTarget = $("input:checked[name=hypnotizedTarget]").val() || null;
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
-      target: target});
+      target: target, hypnotizedTarget: hypnotizedTarget});
   }
 });
 

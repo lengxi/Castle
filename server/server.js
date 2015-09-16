@@ -79,12 +79,13 @@ Meteor.methods({
         _id: u._id,
         turn: k,
         assoc: k % 2,
-        prof: Professions.THUG._id,
-        prof_state: false,
+        prof: Professions.SWORDSMAN._id,
+        prof_state: Professions.UNPLAYED,
         cards: all_hands[k],
         attacking: false,
         defending: false,
-        supports: -1
+        supports: null,
+        hypnotized: false
       };
       return player;
     });

@@ -8,6 +8,7 @@
     <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
+    <input class="btn btn-failure" id="do_nothing" type="button" value="Do Nothing" />
   {{else}}
     <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
   {{/if}}
@@ -70,7 +71,7 @@
       <h4>You played {{getCardName game.state.meta.played_card}}!</h4>
       <input class="btn btn-success play_success" type="button" value="Next" />
     {{else}}
-      <h4>You cannot play {{getCardName game.state.meta.played_card}}.</h4>
+      <h4>No card was successfully played... going back.</h4>
       <input class="btn btn-failure play_failure" type="button" value="Go back" />
     {{/if}} 
   {{else}}
@@ -107,6 +108,20 @@
     {{/if}}
   {{/each}}
   </div><br />
+  {{#if isMeProfession 7}} 
+    <h4>Choose someone to hypnotize!</h4>
+    <div>
+    {{#each game.players}}
+      {{#if isMe _id}}
+      {{else}}
+        <label class="radio-inline">
+          <input type="radio" name="hypnotizedTarget" value="{{_id}}" >
+          {{getDisplayName _id}}
+        </label>
+      {{/if}}
+    {{/each}}
+    </div><br />
+  {{/if}}
   <input class="btn btn-success" id="choose_attack" type="button" value="Declare Attack" />
 {{else}}
   <h4>Waiting on {{getDisplayName game.state.wait_on}} to choose who to attack.</h4>

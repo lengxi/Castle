@@ -6,11 +6,11 @@
       <span>Profession: 
       {{#if isMe _id}}
       	{{getProfessionName prof}} 
-        {{#if prof_state}} 
+        {{#if isProfRevealed prof_state}} 
           (Played)
         {{/if}}
       {{else}}
-      	{{#if prof_state}} 
+      	{{#if isProfRevealed prof_state}} 
       		{{getProfessionName prof}} (Played)
       	{{else}} 
       		Unknown
