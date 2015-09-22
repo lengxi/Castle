@@ -18,7 +18,21 @@
   {{#if is_my_action}}
     {{#if game.state.meta.success}}
       <h4>You have chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
-      <input class="btn btn-success play_success" type="button" value="Next" />
+      <div class="form-group">
+      {{#if isMeProfession 1}}
+        <div>
+          <h4>Choose someone to win this struggle:</h4>
+          <ul class="list-unstyled">
+          <li><label class="radio-inline">
+              <input type="radio" name="choose_winner" value="attacker"/>
+          </label></li>
+          <li><label class="radio-inline">
+              <input type="radio" name="choose_winner" value="defender"/>
+          </label></li>
+        </ul></div>
+      {{/if}}
+        <div><input class="btn btn-success play_success" type="button" value="Next" /></div>
+      </div>
     {{else}}
       <h4>Trying to play profession...Did not succeed.</h4>
       <input class="btn btn-failure play_failure" type="button" value="Go back" />
