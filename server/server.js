@@ -79,7 +79,7 @@ Meteor.methods({
         _id: u._id,
         turn: k,
         assoc: k % 2,
-        prof: Professions.SWORDSMAN._id,
+        prof: Professions.PRIEST._id,
         prof_state: Professions.UNPLAYED,
         cards: all_hands[k],
         attacking: false,
@@ -160,6 +160,9 @@ Meteor.methods({
             //already handled by the callback
             break;
           case Game.STEAL_CARD._id:
+            Games.update({_id: gameId}, {$set: { state: next }});
+            break;
+          case Game.END_TURN._id:
             Games.update({_id: gameId}, {$set: { state: next }});
             break;
           default:
