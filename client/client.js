@@ -236,7 +236,13 @@ Template.STEAL_INFO.events({
 /*******************/
 Template.PLAY_PROFESSION.events({
   'click .play_success': function(event, template) {
-    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+    var winner = $("input:checked[name=choose_winner]");
+    if (winner.length > 0) {
+      Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, 
+        {winner: winner.val()});
+    } else {
+      Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+    }
   },
   'click .play_failure': function(event, template) {
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
