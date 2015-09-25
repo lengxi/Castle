@@ -47,9 +47,7 @@ Handlebars.registerHelper('isMe', function(userId) {
 
 Handlebars.registerHelper('isMeProfession', function(professionId) {
   var player = getPlayer(game.players, Meteor.user()._id);
-  return player.prof === professionId
-    && (player.prof_state === Professions.PLAYED
-      || player.prof_state === Professions.JUST_PLAYED);
+  return player.prof === professionId;
 });
 
 Handlebars.registerHelper('isProfRevealed', function(profState) {

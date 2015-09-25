@@ -26,11 +26,13 @@
             <li>
               <label class="radio-inline">
                 <input type="radio" name="choose_winner" value="attacker"/>
+                Attacker
               </label>
             </li>
             <li>
               <label class="radio-inline">
                 <input type="radio" name="choose_winner" value="defender"/>
+                 Defender
               </label>
             </li>
           </ul>
@@ -129,7 +131,8 @@
     {{/if}}
   {{/each}}
   </div><br />
-  {{#if isMeProfession 7}} 
+  {{#if isMeProfession 7}}
+  {{#if isProfRevealed}}
     <h4>Choose someone to hypnotize!</h4>
     <div>
     {{#each game.players}}
@@ -142,6 +145,7 @@
       {{/if}}
     {{/each}}
     </div><br />
+  {{/if}}
   {{/if}}
   <input class="btn btn-success" id="choose_attack" type="button" value="Declare Attack" />
 {{else}}
