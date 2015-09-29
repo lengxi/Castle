@@ -79,7 +79,7 @@ Meteor.methods({
         _id: u._id,
         turn: k,
         assoc: k % 2,
-        prof: Professions.ALCHEMIST._id,
+        prof: Professions.DOCTOR._id,
         prof_state: Professions.UNPLAYED,
         cards: all_hands[k],
         attacking: false,
