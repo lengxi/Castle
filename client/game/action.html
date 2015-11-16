@@ -6,6 +6,7 @@
   {{#if is_my_action}}
     <h4>It's your turn! Choose an action: </h4>
     <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
+    <input class="btn btn-success" id="begin_trade" type="button" value="Trade" />
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
     <input class="btn btn-failure" id="do_nothing" type="button" value="Do Nothing" />
@@ -135,15 +136,19 @@
   {{#if isProfRevealed}}
     <h4>Choose someone to hypnotize!</h4>
     <div>
-    {{#each game.players}}
-      {{#if isMe _id}}
-      {{else}}
-        <label class="radio-inline">
-          <input type="radio" name="hypnotizedTarget" value="{{_id}}" >
-          {{getDisplayName _id}}
-        </label>
-      {{/if}}
-    {{/each}}
+      <ul class="list-unstyled">
+        {{#each game.players}}
+          {{#if isMe _id}}
+          {{else}}
+          <li>
+            <label class="radio-inline">
+              <input type="radio" name="target" value="{{_id}}" >
+              {{getDisplayName _id}}
+            </label>
+          </li>
+          {{/if}}
+        {{/each}}
+      </ul>
     </div><br />
   {{/if}}
   {{/if}}
@@ -276,6 +281,49 @@
   {{else}}
     <h4>Waiting for {{getDisplayName game.state.meta.winner}} to finish looking at {{getDisplayName game.state.meta.loser}}'s association and profession.</h4>
   {{/if}}
+</template>
+
+<template name="BEGIN_TRADE">
+{{#if is_my_action}}
+  <h4>Choose a card to offer in trade:</h4>
+  <div>
+  <ul class="list-unstyled">
+    {{#each me.cards}}
+      {{#with getCard this.card}}
+        <li>
+          <label class="radio-inline">
+            <input type="radio" name="trade_card" value="{{_id}}">
+            {{name}}
+          </label>
+        </li>
+      {{/with}}
+    {{/each}}
+  </ul>
+  </div><br />
+  <h4>Choose a player to trade with:</h4>
+  <div>
+    <ul class="list-unstyled">
+      {{#each game.players}}
+        {{#if isMe _id}}
+        {{else}}
+        <li>
+          <label class="radio-inline">
+            <input type="radio" name="trade_target" value="{{_id}}" >
+            {{getDisplayName _id}}
+          </label>
+        </li>
+        {{/if}}
+      {{/each}}
+    </ul>
+  </div><br />
+  <input class="btn btn-success" id="offer_trade" type="button" value="Trade" />
+{{else}}
+  <h4>Waiting on {{getDisplayName game.state.wait_on}} to offer a card in trade.</h4>
+{{/if}}
+</template>
+
+<template name="TRADE_RESPONSE">
+  trade response
 </template>
 
 <template name="DECLARE_VICTORY">

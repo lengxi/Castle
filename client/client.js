@@ -4,7 +4,10 @@ Meteor.subscribe('games');
 
 Handlebars.registerHelper('getDisplayName', function(id) {
   var user = Meteor.users.findOne({_id: id});
-  return user.services.github.username;
+  if (user.services) {
+    return user.services.github.username;
+  }
+  return "";
 });
 
 Handlebars.registerHelper('getProfessionName', function(id) {
@@ -86,25 +89,31 @@ STATE_TEMPLATES[8] = Template.STEAL_CARD;
 STATE_TEMPLATES[9] = Template.STEAL_INFO;
 STATE_TEMPLATES[11] = Template.PLAY_CARD;
 STATE_TEMPLATES[12] = Template.POST_PLAY_CARD;
+STATE_TEMPLATES[13] = Template.BEGIN_TRADE;
+STATE_TEMPLATES[14] = Template.TRADE_RESPONSE;
 
-Template.home.hasUser = function () {
-  return Meteor.user() != null;
-};
-Template.home.user = function () {
-  return Meteor.user();
-};
+Template.home.helpers({
+  hasUser: function () {
+    return Meteor.user() != null;
+  },
+  user: function () {
+    return Meteor.user();
+  }
+});
 Template.home.events({
   'click #create_room': function() {
     Meteor.call('create_room', Meteor.user());
   }
 })
 
-Template.rooms.rooms = function() {
-  return Rooms.find({});
-};
-Template.room.notCreator = function() {
-  return this.creator !== Meteor.user()._id;
-}
+Template.rooms.helpers({
+  rooms: function() {
+    return Rooms.find({});
+  },
+  notCreator: function() {
+    return this.creator !== Meteor.user()._id;
+  }
+});
 Template.room.events({
   'click #join_room': function () {
     Meteor.call('join_room', this._id, Meteor.user());
@@ -121,9 +130,11 @@ Deps.autorun(function(c) {
   } 
 });
 
-Template.action.my_action_template = function() {
-  return STATE_TEMPLATES[Games.findOne().state.action];
-};
+Template.action.helpers({
+  my_action_template: function() {
+    return STATE_TEMPLATES[Games.findOne().state.action];
+  }
+});
 
 Template.game_layout.events({
   'click #clear_game': function(event, template) {
@@ -147,6 +158,9 @@ Template.TURN_START.events({
   },
   'click #begin_combat': function(event, template) {
     Meteor.call('begin_combat', template.data.game._id, Meteor.user()._id);
+  },
+  'click #begin_trade': function(event, template) {
+    Meteor.call('begin_trade', template.data.game._id, Meteor.user()._id);
   },
   'click #do_nothing': function(event, template) {
     Meteor.call('end_turn', template.data.game._id, Meteor.user()._id);
@@ -285,6 +299,18 @@ Template.FREE_RESPONSE.events({
   }
 });
 
+/***************/
+/* BEGIN TRADE */
+/***************/
+Template.BEGIN_TRADE.events({
+  'click #offer_trade': function(event, template) {
+    var card = $("input:checked[name=trade_card]").val();
+    var target = $("input:checked[name=trade_target]").val();
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
+      card: card, target: target});
+  }
+});
+
 /*******************/
 /* DECLARE_VICTORY */
 /*******************/
@@ -312,4 +338,4 @@ Template.DECLARE_VICTORY.helpers({
     var winningTeamIds = this.game.state.meta.winning_team_ids;
     return _.contains(winningTeamIds, me._id);
   }
-})
+});

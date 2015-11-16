@@ -163,6 +163,10 @@ Meteor.methods({
           case Game.STEAL_CARD._id:
             Games.update({_id: gameId}, {$set: { state: next }});
             break;
+          case Game.TRADE_RESPONSE._id:
+            if (game.state.meta.success === true) {
+              Games.update({_id: gameId}, {$set: {state: next}});
+            }
           case Game.END_TURN._id:
             Games.update({_id: gameId}, {$set: { state: next }});
             break;
@@ -181,6 +185,20 @@ Meteor.methods({
           userId, userId, { success: false });
 
         var res = Game.BEGIN_COMBAT.doAction(game._id, userId);
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
+      }
+    }
+  },
+
+  begin_trade: function(gameId, userId) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId) {
+
+        game.state = doTransition(gameId, Game.BEGIN_TRADE._id,
+          userId, userId, { success: false });
+
+        var res = Game.BEGIN_TRADE.doAction(game._id, userId);
         Games.update({_id: game._id}, {$set: {"state.meta": res}});
       }
     }
