@@ -91,6 +91,7 @@ STATE_TEMPLATES[11] = Template.PLAY_CARD;
 STATE_TEMPLATES[12] = Template.POST_PLAY_CARD;
 STATE_TEMPLATES[13] = Template.BEGIN_TRADE;
 STATE_TEMPLATES[14] = Template.TRADE_RESPONSE;
+STATE_TEMPLATES[15] = Template.RESOLVE_TRADE;
 
 Template.home.helpers({
   hasUser: function () {
@@ -109,11 +110,15 @@ Template.home.events({
 Template.rooms.helpers({
   rooms: function() {
     return Rooms.find({});
-  },
+  }
+});
+
+Template.room.helpers({
   notCreator: function() {
     return this.creator !== Meteor.user()._id;
   }
 });
+
 Template.room.events({
   'click #join_room': function () {
     Meteor.call('join_room', this._id, Meteor.user());
@@ -308,6 +313,30 @@ Template.BEGIN_TRADE.events({
     var target = $("input:checked[name=trade_target]").val();
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
       card: card, target: target});
+  }
+});
+
+/******************/
+/* TRADE RESPONSE */
+/******************/
+Template.TRADE_RESPONSE.events({
+  'click #accept_trade': function(event, template) {
+    var card = $("input:checked[name=trade_card]").val();
+    Meteor.call('trade_response', template.data.game._id, Meteor.user()._id, {
+      card: card});
+  },
+  'click #decline_trade': function(event, template) {
+    Meteor.call('trade_response', template.data.game._id, Meteor.user()._id, {
+      card: -1});
+  },
+  'click #accept_response': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #decline_response': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #invalid_response': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
   }
 });
 

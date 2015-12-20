@@ -323,7 +323,55 @@
 </template>
 
 <template name="TRADE_RESPONSE">
-  trade response
+{{#if game.state.meta.success}}
+  {{#if game.state.meta.trade_valid}}
+    {{#if game.state.meta.trade_response.accepted}}
+      <h4>Trade successful! Continuing to trade resolution...</h4>
+      {{#if is_my_action}}
+        <input class="btn btn-success" id="accept_response" type="button" value="Continue" />
+      {{/if}}
+    {{else}}
+      <h4>Trade was declined!</h4>
+      {{#if is_my_action}}
+        <input class="btn btn-success" id="decline_response" type="button" value="Continue" />
+      {{/if}}
+    {{/if}}
+  {{else}}
+    <h4>Response invalid. Returning to trade response...</h4>
+    {{#if is_my_action}}
+      <input class="btn btn-failure" id="invalid_response" type="button" value="Go back" />
+    {{/if}}
+  {{/if}}
+{{else}}
+  {{#if is_my_action}}
+    <h4>Choose a card to trade back to {{getDisplayName game.state.user}} 
+      for {{getCardName game.state.meta.trade_card}}:</h4>
+    <div>
+    <ul class="list-unstyled">
+      {{#each me.cards}}
+        {{#with getCard this.card}}
+          <li>
+            <label class="radio-inline">
+              <input type="radio" name="trade_card" value="{{_id}}">
+              {{name}}
+            </label>
+          </li>
+        {{/with}}
+      {{/each}}
+    </ul>
+    </div><br />
+    <input class="btn btn-success" id="accept_trade" type="button" value="Accept" />
+    <h4>Or decline the trade:</h4>
+    <input class="btn btn-failure" id="decline_trade" type="button" value="Decline" />
+  {{else}}
+    <h4>Waiting on {{getDisplayName game.state.wait_on}} to decide whether 
+      to trade with {{getDisplayName game.state.user}}.</h4>
+  {{/if}}
+{{/if}}
+</template>
+
+<template name="RESOLVE_TRADE">
+  resolve trade
 </template>
 
 <template name="DECLARE_VICTORY">

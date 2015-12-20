@@ -204,6 +204,17 @@ Meteor.methods({
     }
   },
 
+  trade_response: function(gameId, userId, extraData) {
+    var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
+    if (game !== null) {
+      if (game.state.wait_on === userId) {
+
+        var res = Game.TRADE_RESPONSE.doAction(game._id, userId, extraData);
+        Games.update({_id: game._id}, {$set: {"state.meta": res}});
+      }
+    }
+  },
+
   declare_support: function(gameId, userId, support) {
     var game = Games.findOne({_id: gameId, players: {$elemMatch: {_id: userId}}});
     if (game !== null) {
