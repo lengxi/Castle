@@ -42,13 +42,13 @@ function dealCards(num_players) {
     if (i % 2 === 0) {
       hands.push([
         {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED},
-        {card: Cards.GLOVES._id, card_state: Cards.UNPLAYED},
+        {card: Cards.BLACK_PEARL._id, card_state: Cards.UNPLAYED},
         {card: Cards.THROWING_KNIVES._id, card_state: Cards.UNPLAYED},
         {card: Cards.WHIP._id, card_state: Cards.UNPLAYED}
       ]);
     } else {
       hands.push([
-        {card: Cards.POISON_RING._id, card_state: Cards.UNPLAYED},
+        {card: Cards.SHATTERED_MIRROR._id, card_state: Cards.UNPLAYED},
         {card: Cards.WHIP._id, card_state: Cards.UNPLAYED},
         {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED}
       ]);
@@ -164,9 +164,14 @@ Meteor.methods({
             Games.update({_id: gameId}, {$set: { state: next }});
             break;
           case Game.TRADE_RESPONSE._id:
-            if (game.state.meta.success === true) {
+            Games.update({_id: gameId}, {$set: {state: next}});
+            break;
+          case Game.RESOLVE_TRADE._id:
+            if (game.state.meta.success === true
+              && game.state.meta.trade_valid === true) {
               Games.update({_id: gameId}, {$set: {state: next}});
             }
+            break;
           case Game.END_TURN._id:
             Games.update({_id: gameId}, {$set: { state: next }});
             break;
