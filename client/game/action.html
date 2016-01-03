@@ -371,7 +371,30 @@
 </template>
 
 <template name="RESOLVE_TRADE">
-  resolve trade
+  {{#if not_trader_or_tradee}}
+    <h4>Waiting for trade resolution to begin.</h4>
+    <i>{{getDisplayName game.state.user}}</i> traded <b>{{getTradedCardName game.state.meta.trade_card}}</b> to 
+    <i>{{getDisplayName game.state.meta.trade_target}}</i> for <b>{{getTradedCardName game.state.meta.trade_response.card}}</b>!
+  {{else}}
+    {{#if is_my_action}}
+      {{> getCardTemplate}}
+    {{/if}}
+  {{/if}}
+</template>
+<template name="BAG_KEY">
+  <h4>
+</template>
+<template name="BAG_GOBLET">
+</template>
+<template name="COAT">
+</template>
+<template name="MONOCLE">
+</template>
+<template name="PRIVILEGE">
+</template>
+<template name="ASTROLABE">
+</template>
+<template name="TOME">
 </template>
 
 <template name="DECLARE_VICTORY">

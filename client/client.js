@@ -340,6 +340,36 @@ Template.TRADE_RESPONSE.events({
   }
 });
 
+/*****************/
+/* RESOLVE TRADE */
+/*****************/
+Template.RESOLVE_TRADE.helpers({
+  'not_trader_or_tradee': function(uid) {
+    return me._id !== this.game.state.meta.trade_target
+      && me._id !== this.game.state.meta.user;
+  },
+  'i_am_trader': function(uid) {
+    return me._id === this.game.state.meta.user;
+  },
+  'i_am_tradee': function(uid) {
+    return me._id === this.game.state.meta.trade_target;
+  },
+  'getTradedCardName': function(cid) {
+    switch(cid) {
+      case Card.BAG_KEY._id:
+      case Card.BAG_GOBLET._id:
+      case Card.COAT._id:
+      case Card.MONOCLE._id:
+      case Card.PRIVILEGE._id:
+      case Card.ASTROLABE._id:
+      case Card.TOME._id:
+        return getCardById(cid).name;
+      default:
+        return "_______";
+    }
+  }
+});
+
 /*******************/
 /* DECLARE_VICTORY */
 /*******************/
