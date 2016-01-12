@@ -346,13 +346,7 @@ Template.TRADE_RESPONSE.events({
 Template.RESOLVE_TRADE.helpers({
   'not_trader_or_tradee': function(uid) {
     return me._id !== this.game.state.meta.trade_target
-      && me._id !== this.game.state.meta.user;
-  },
-  'i_am_trader': function(uid) {
-    return me._id === this.game.state.meta.user;
-  },
-  'i_am_tradee': function(uid) {
-    return me._id === this.game.state.meta.trade_target;
+      && me._id !== this.game.state.user;
   },
   'getTradedCardName': function(cid) {
     switch(cid) {
@@ -367,6 +361,39 @@ Template.RESOLVE_TRADE.helpers({
       default:
         return "_______";
     }
+  },
+  'getCardTemplate': function() {
+    var card;
+    if (this.game.state.meta.wait_on === this.game.state.user) {
+      card = this.game.state.meta.trade_card;
+    } else {
+      card = this.game.state.meta.trade_response.card;
+    }
+
+    switch(card) {
+      case Card.BAG_KEY._id:
+        return Template.BAG_KEY;
+      case Card.BAG_GOBLET._id:
+        return Template.BAG_GOBLET;
+      case Card.COAT._id:
+        return Template.COAT;
+      case Card.MONOCLE._id:
+        return Template.MONOCLE;
+      case Card.PRIVILEGE._id:
+        return Template.PRIVILEGE;
+      case Card.ASTROLABE._id:
+        return Template.ASTROLABE;
+      case Card.TOME._id:
+        return Template.TOME;
+      default:
+        return Template.NO_EFFECT;
+    }
+  }
+});
+Template.NO_EFFECT.events({
+  'click #continue': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: -1});
   }
 });
 
