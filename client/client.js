@@ -147,10 +147,13 @@ Template.game_layout.events({
   }
 });
 
-UI.registerHelper('is_my_action', function() {
-  return Games.findOne().state.wait_on === Meteor.user()._id;
+UI.registerHelper('is_my_action', function(gameId) {
+  return Games.findOne({_id: gameId}).state.wait_on === Meteor.user()._id;
 });
-
+UI.registerHelper('is_done', function(gameId) {
+  var game = Games.findOne({_id: gameId});
+  return game.state.wait_on === game.state.meta.trade_target;
+});
 /**************/
 /* TURN START */
 /**************/
@@ -344,46 +347,48 @@ Template.TRADE_RESPONSE.events({
 /* RESOLVE TRADE */
 /*****************/
 Template.RESOLVE_TRADE.helpers({
-  'not_trader_or_tradee': function(uid) {
-    return me._id !== this.game.state.meta.trade_target
-      && me._id !== this.game.state.user;
+  'is_trader_or_tradee': function(uid) {
+    return me._id === this.game.state.meta.trade_target
+      || me._id === this.game.state.user;
   },
   'getTradedCardName': function(cid) {
     switch(cid) {
-      case Card.BAG_KEY._id:
-      case Card.BAG_GOBLET._id:
-      case Card.COAT._id:
-      case Card.MONOCLE._id:
-      case Card.PRIVILEGE._id:
-      case Card.ASTROLABE._id:
-      case Card.TOME._id:
+      case Cards.BAG_KEY._id:
+      case Cards.BAG_GOBLET._id:
+      case Cards.COAT._id:
+      case Cards.MONOCLE._id:
+      case Cards.PRIVILEGE._id:
+      case Cards.ASTROLABE._id:
+      case Cards.TOME._id:
         return getCardById(cid).name;
       default:
-        return "_______";
+        return "(unknown)";
     }
+  },
+  'getTradedCardNameFull': function(cid) {
+    return getCardById(cid).name;
   },
   'getCardTemplate': function() {
     var card;
-    if (this.game.state.meta.wait_on === this.game.state.user) {
+    if (this.game.state.wait_on === this.game.state.user) {
       card = this.game.state.meta.trade_card;
     } else {
-      card = this.game.state.meta.trade_response.card;
+      card = this.game.state.meta.trade_response_card;
     }
-
     switch(card) {
-      case Card.BAG_KEY._id:
+      case Cards.BAG_KEY._id:
         return Template.BAG_KEY;
-      case Card.BAG_GOBLET._id:
+      case Cards.BAG_GOBLET._id:
         return Template.BAG_GOBLET;
-      case Card.COAT._id:
+      case Cards.COAT._id:
         return Template.COAT;
-      case Card.MONOCLE._id:
+      case Cards.MONOCLE._id:
         return Template.MONOCLE;
-      case Card.PRIVILEGE._id:
+      case Cards.PRIVILEGE._id:
         return Template.PRIVILEGE;
-      case Card.ASTROLABE._id:
+      case Cards.ASTROLABE._id:
         return Template.ASTROLABE;
-      case Card.TOME._id:
+      case Cards.TOME._id:
         return Template.TOME;
       default:
         return Template.NO_EFFECT;
@@ -391,9 +396,39 @@ Template.RESOLVE_TRADE.helpers({
   }
 });
 Template.NO_EFFECT.events({
-  'click #continue': function(event, template) {
+  'click #resolve_action': function(event, template) {
     Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
       {resolve_action: -1});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
+Template.BAG_KEY.events({
+  'click #resolve_action': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.BAG_KEY._id});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
+Template.BAG_GOBLET.events({
+  'click #resolve_action': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.BAG_GOBLET._id});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
   }
 });
 

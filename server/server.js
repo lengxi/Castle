@@ -34,27 +34,22 @@ function doTransition(gameId, newState, userId, waitOn, meta) {
 }
 
 // returns array of array
-// hand for each player position
-// TODO dont' hard code
-function dealCards(num_players) {
+// hand for each player position.
+// deck: array of card ids.
+function dealCards(deck, num_players) {
   var hands = [];
-  for (var i = 0; i < num_players; i++) {
-    if (i % 2 === 0) {
-      hands.push([
-        {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED},
-        {card: Cards.BLACK_PEARL._id, card_state: Cards.UNPLAYED},
-        {card: Cards.THROWING_KNIVES._id, card_state: Cards.UNPLAYED},
-        {card: Cards.WHIP._id, card_state: Cards.UNPLAYED}
-      ]);
-    } else {
-      hands.push([
-        {card: Cards.SHATTERED_MIRROR._id, card_state: Cards.UNPLAYED},
-        {card: Cards.WHIP._id, card_state: Cards.UNPLAYED},
-        {card: Cards.DAGGER._id, card_state: Cards.UNPLAYED}
-      ]);
-    }
+  // bags must be in starting pool of cards in players' hands
+  var drawn = [Cards.BAG_KEY._id, Cards.BAG_GOBLET._id];
+  for (var i = 0; i < num_players - 2; i++) {
+    drawn.push(deck[0]);
+    deck.splice(0, 1);
   }
-
+  drawn = _.shuffle(drawn);
+  for (var i = 0; i < num_players; i++) {
+    hands.push([
+      {card: drawn[i], card_state: Cards.UNPLAYED}
+    ]);
+  }
   return hands;
 }
 
@@ -73,7 +68,26 @@ Meteor.methods({
     var room = Rooms.findOne({_id: roomId});
     Rooms.remove({_id: roomId});
 
-    var all_hands = dealCards(room.users.length);
+    var deck = [
+      Cards.GOBLET, Cards.GOBLET, Cards.GOBLET,
+      Cards.KEY, Cards.KEY, Cards.KEY,
+      Cards.LODGE, 
+      Cards.BLACK_PEARL, 
+      Cards.COAT, 
+      Cards.MONOCLE, 
+      Cards.PRIVILEGE, 
+      Cards.ASTROLABE, 
+      Cards.SHATTERED_MIRROR, 
+      Cards.TOME, 
+      Cards.DAGGER, 
+      Cards.GLOVES, 
+      Cards.POISON_RING, 
+      Cards.THROWING_KNIVES, 
+      Cards.WHIP];
+    deck = _.map(deck, function(card) {return card._id;});
+    deck = _.shuffle(deck);
+
+    var all_hands = dealCards(deck, room.users.length);
     var players = _.map(room.users, function(u, k) {
       var player = {
         _id: u._id,
@@ -93,6 +107,7 @@ Meteor.methods({
 
     var game = {
       players: players,
+      deck: deck,
       state: {
         action: Game.TURN_START._id,
         user: user._id,

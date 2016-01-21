@@ -3,7 +3,7 @@
 </template>
 
 <template name="TURN_START">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>It's your turn! Choose an action: </h4>
     <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
     <input class="btn btn-success" id="begin_trade" type="button" value="Trade" />
@@ -16,7 +16,7 @@
 </template>
 
 <template name="PLAY_PROFESSION">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     {{#if game.state.meta.success}}
       <h4>You have chosen to play {{getProfessionName game.state.meta.prof}}!</h4>
       <div class="form-group">
@@ -57,7 +57,7 @@
 </template>
 
 <template name="PLAY_CARD">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>Pick a card to play</h4>
     <div class="form-group">
       <div>
@@ -90,7 +90,7 @@
 </template>
 
 <template name="POST_PLAY_CARD">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     {{#if game.state.meta.success}}
       <h4>You played {{getCardName game.state.meta.played_card}}!</h4>
       <input class="btn btn-success play_success" type="button" value="Next" />
@@ -108,7 +108,7 @@
 </template>
 
 <template name="FREE_RESPONSE">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>Your chance to play a profession or a card! Choose an action: </h4>
     <input class="btn btn-success" id="play_profession" type="button" value="Play Profession" />
     <input class="btn btn-success" id="play_card" type="button" value="Play Card" />
@@ -119,7 +119,7 @@
 </template>
 
 <template name="BEGIN_COMBAT">
-{{#if is_my_action}}
+{{#if is_my_action game._id}}
   <h4>Choose someone to attack!</h4>
   <div>
   {{#each game.players}}
@@ -159,7 +159,7 @@
 </template>
 
 <template name="DECLARE_SUPPORT">
-{{#if is_my_action}}
+{{#if is_my_action game._id}}
   {{#if game.state.meta.success}}
     <h4>You have chosen to support {{getDisplayName game.state.meta.supports}}!</h4>
     <input class="btn btn-success" id="support_success" type="button" value="Next" />
@@ -208,11 +208,11 @@
     with a score of {{game.state.meta.winner_score}} to {{game.state.meta.loser_score}}.
     </h4>
   {{/if}}
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <input class="btn btn-success" type="button" id="post_combat" value="Next" />
   {{/if}}
 {{else}}
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>Time to see who won the struggle!</h4>
     <input class="btn btn-success" type="button" id="resolve_combat" value="Next" />
   {{else}}
@@ -222,7 +222,7 @@
 </template>
 
 <template name="POST_COMBAT">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     {{#if game.state.meta.is_draw}}
       <h4>Both you and {{getDisplayName game.state.meta.loser}} draw a card as the struggle ended in a draw.</h4>
       <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
@@ -243,11 +243,11 @@
 <template name="STEAL_CARD">
   {{#if game.state.meta.success}}
     <h4>A card was successfully taken!</h4>
-    {{#if is_my_action}}
+    {{#if is_my_action game._id}}
       <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
     {{/if}}
   {{else}}
-    {{#if is_my_action}}
+    {{#if is_my_action game._id}}
       <div class="form-group">
         <div>
           <ul class="list-unstyled">
@@ -274,7 +274,7 @@
 </template>
 
 <template name="STEAL_INFO">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>{{getDisplayName game.state.meta.loser}}'s association: {{get_association_name game.state.meta.loser_assoc}}</h4>
     <h4>{{getDisplayName game.state.meta.loser}}'s profession: {{getProfessionName game.state.meta.loser_prof}}</h4>
     <input class="btn btn-success" type="button" id="finish_combat" value="Next" />
@@ -284,7 +284,7 @@
 </template>
 
 <template name="BEGIN_TRADE">
-{{#if is_my_action}}
+{{#if is_my_action game._id}}
   <h4>Choose a card to offer in trade:</h4>
   <div>
   <ul class="list-unstyled">
@@ -327,23 +327,26 @@
   {{#if game.state.meta.trade_valid}}
     {{#if game.state.meta.trade_response.accepted}}
       <h4>Trade successful! Continuing to trade resolution...</h4>
-      {{#if is_my_action}}
+      {{#if is_my_action game._id}}
         <input class="btn btn-success" id="accept_response" type="button" value="Continue" />
       {{/if}}
     {{else}}
       <h4>Trade was declined!</h4>
-      {{#if is_my_action}}
+      {{#if is_my_action game._id}}
         <input class="btn btn-success" id="decline_response" type="button" value="Continue" />
       {{/if}}
     {{/if}}
   {{else}}
-    <h4>Response invalid. Returning to trade response...</h4>
-    {{#if is_my_action}}
+    {{#if is_my_action game._id}}
+      <h4>Response invalid. Returning to trade response...</h4>
       <input class="btn btn-failure" id="invalid_response" type="button" value="Go back" />
+    {{else}}
+      <h4>Waiting on {{getDisplayName game.state.wait_on}} to decide whether 
+      to trade with {{getDisplayName game.state.user}}.</h4>
     {{/if}}
   {{/if}}
 {{else}}
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
     <h4>Choose a card to trade back to {{getDisplayName game.state.user}} 
       for {{getCardName game.state.meta.trade_card}}:</h4>
     <div>
@@ -371,19 +374,46 @@
 </template>
 
 <template name="RESOLVE_TRADE">
-  {{#if is_my_action}}
+  {{#if is_my_action game._id}}
+    <h4>Resolving trade effects.</h4>
     {{> getCardTemplate}}
   {{else}}
-    <p><i>{{getDisplayName game.state.user}}</i> traded <b>{{getTradedCardName game.state.meta.trade_card}}</b> to 
-    <i>{{getDisplayName game.state.meta.trade_target}}</i> for <b>{{getTradedCardName game.state.meta.trade_response.card}}</b>.</p>
+    {{#if is_trader_or_tradee}}
+      <h4>{{getDisplayName game.state.user}} traded <b>{{getTradedCardNameFull game.state.meta.trade_card}}</b> to 
+      {{getDisplayName game.state.meta.trade_target}} for <b>{{getTradedCardNameFull game.state.meta.trade_response_card}}</b>.</h4>
+    {{else}}
+      <h4>{{getDisplayName game.state.user}} traded <b>{{getTradedCardName game.state.meta.trade_card}}</b> to 
+      {{getDisplayName game.state.meta.trade_target}} for <b>{{getTradedCardName game.state.meta.trade_response_card}}</b>.</h4>
+    {{/if}}
     <h4>Waiting on {{getDisplayName game.state.wait_on}} to resolve trade effects.</h4>
   {{/if}}
 </template>
 
 <template name="BAG_KEY">
-
+  {{#if game.state.meta.success}}
+    <h4>You drew a card!</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>You traded a <b>Bag of Secrets (Key)</b>. Draw a card.</h4>
+    <input class="btn btn-success" id="resolve_action" type="button" value="Continue" />
+  {{/if}}
 </template>
 <template name="BAG_GOBLET">
+  {{#if game.state.meta.success}}
+    <h4>You drew a card!</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>You traded a <b>Bag of Secrets (Goblet)</b>. Draw a card.</h4>
+    <input class="btn btn-success" id="resolve_action" type="button" value="Continue" />
+  {{/if}}
 </template>
 <template name="COAT">
 </template>
@@ -396,9 +426,18 @@
 <template name="TOME">
 </template>
 <template name="NO_EFFECT">
-  <h4>No effects to resolve</h4>
-  <input class="btn btn-success" id="continue" type="button" value="Continue" />
-</template
+  {{#if game.state.meta.success}}
+    <h4>Click again to move on.</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>No effects to resolve.</h4>
+    <input class="btn btn-success" id="resolve_action" type="button" value="Continue" />
+  {{/if}}
+</template>
 
 <template name="DECLARE_VICTORY">
   {{#if game.state.meta.success}}
@@ -435,7 +474,7 @@
     {{/if}}
     </b>
   {{else}}
-    {{#if is_my_action}}
+    {{#if is_my_action game._id}}
       <div class="form-group">
         <b>Declare victory for:</b>
         <div>
