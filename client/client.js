@@ -14,6 +14,10 @@ Handlebars.registerHelper('getProfessionName', function(id) {
   return getProfById(id).name;
 });
 
+Handlebars.registerHelper('getProfessionDesc', function(id) {
+  return getProfById(id).desc;
+});
+
 Handlebars.registerHelper('get_association_name', function(assoc_id) {
   return ASSOCIATIONS[assoc_id];
 });

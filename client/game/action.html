@@ -418,6 +418,17 @@
 <template name="COAT">
 </template>
 <template name="MONOCLE">
+  {{#if game.state.meta.success}}
+    <h4>{{getDisplayName game.state.meta.monocle_target}}'s association: {{get_association_name game.state.meta.monocle_target_assoc}}</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>You traded a <b>Monocle</b>. You may now look at your trading partner's association.</h4>
+    <input class="btn btn-success" id="resolve_action" type="button" value="Continue" />
+  {{/if}}
 </template>
 <template name="PRIVILEGE">
 </template>

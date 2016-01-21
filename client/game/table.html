@@ -5,13 +5,13 @@
       <span><strong>{{getDisplayName _id}} ({{turn}})</strong> -- Num Cards: {{cards.length}}</span><br/>
       <span>Profession: 
       {{#if isMe _id}}
-      	{{getProfessionName prof}} 
+      	<a href="#" data-toggle="tooltip" title="{{getProfessionDesc prof}}">{{getProfessionName prof}}</a>
         {{#if isProfRevealed prof_state}} 
           (Played)
         {{/if}}
       {{else}}
       	{{#if isProfRevealed prof_state}} 
-      		{{getProfessionName prof}} (Played)
+          <a href="#" data-toggle="tooltip" title="{{getProfessionDesc prof}}">{{getProfessionName prof}}</a>(Played)
       	{{else}} 
       		Unknown
       	{{/if}}

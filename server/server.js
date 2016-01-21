@@ -33,6 +33,22 @@ function doTransition(gameId, newState, userId, waitOn, meta) {
   return newState;
 }
 
+function dealTurns(num_players) {
+  var turns = [];
+  for (var i = 0; i < num_players; i++) {
+    turns.push(i);
+  }
+  return _.shuffle(turns);
+}
+
+function dealAssociations(num_players) {
+  var assocs = [];
+  for (var i = 0; i < num_players; i++) {
+    assocs.push(i % 2);
+  }
+  return _.shuffle(assocs);
+}
+
 // returns array of array
 // hand for each player position.
 // deck: array of card ids.
@@ -44,13 +60,22 @@ function dealCards(deck, num_players) {
     drawn.push(deck[0]);
     deck.splice(0, 1);
   }
-  drawn = _.shuffle(drawn);
+  drawn = _.shuffle(_.shuffle(drawn));
   for (var i = 0; i < num_players; i++) {
     hands.push([
       {card: drawn[i], card_state: Cards.UNPLAYED}
     ]);
   }
   return hands;
+}
+
+function dealProfessions(prof_deck, num_players) {
+  var profs = [];
+  for (var i = 0; i < num_players; i++) {
+    profs.push(prof_deck[0]);
+    prof_deck.splice(0, 1);
+  }
+  return profs;
 }
 
 Meteor.methods({
@@ -68,6 +93,13 @@ Meteor.methods({
     var room = Rooms.findOne({_id: roomId});
     Rooms.remove({_id: roomId});
 
+    // turn order
+    var all_turns = dealTurns(room.users.length);
+    
+    // assocs
+    var all_assocs = dealAssociations(room.users.length);
+
+    // cards
     var deck = [
       Cards.GOBLET, Cards.GOBLET, Cards.GOBLET,
       Cards.KEY, Cards.KEY, Cards.KEY,
@@ -83,17 +115,33 @@ Meteor.methods({
       Cards.GLOVES, 
       Cards.POISON_RING, 
       Cards.THROWING_KNIVES, 
-      Cards.WHIP];
+      Cards.WHIP
+    ];
     deck = _.map(deck, function(card) {return card._id;});
-    deck = _.shuffle(deck);
-
+    deck = _.shuffle(_.shuffle(deck));
     var all_hands = dealCards(deck, room.users.length);
+
+    // profs
+    var prof_deck = [
+      Professions.ALCHEMIST,
+      Professions.DOCTOR,
+      Professions.PRIEST,
+      Professions.SWORDSMAN,
+      Professions.BODYGUARD,
+      Professions.GRAND_MASTER,
+      Professions.HYPNOTIST,
+      Professions.THUG
+    ];
+    prof_deck = _.map(prof_deck, function(prof) {return prof._id;});
+    prof_deck = _.shuffle(_.shuffle(prof_deck));
+    var all_profs = dealProfessions(prof_deck, room.users.length);
+
     var players = _.map(room.users, function(u, k) {
       var player = {
         _id: u._id,
-        turn: k,
-        assoc: k % 2,
-        prof: Professions.DOCTOR._id,
+        turn: all_turns[k],
+        assoc: all_assocs[k],
+        prof: all_profs[k],
         prof_state: Professions.UNPLAYED,
         cards: all_hands[k],
         attacking: false,
@@ -104,14 +152,22 @@ Meteor.methods({
       };
       return player;
     });
+    players = _.sortBy(players, function(player) {
+      return player.turn;
+    });
+
+    var startingPlayer = _.find(players, function(player) {
+      return player.turn === 0;
+    });
 
     var game = {
       players: players,
       deck: deck,
+      prof_deck: prof_deck,
       state: {
         action: Game.TURN_START._id,
-        user: user._id,
-        wait_on: user._id,
+        user: startingPlayer._id,
+        wait_on: startingPlayer._id,
         meta: {}
       },
       hooks: []
