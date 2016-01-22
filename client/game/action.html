@@ -8,7 +8,9 @@
     <input class="btn btn-success" id="begin_combat" type="button" value="Begin Combat" />
     <input class="btn btn-success" id="begin_trade" type="button" value="Trade" />
     <input class="btn btn-success turn_start" id="play_profession" type="button" value="Play Profession" />
+    {{#if can_declare_victory me.cards}}
     <input class="btn btn-success" id="declare_victory" type="button" value="Declare Victory" />
+    {{/if}}
     <input class="btn btn-failure" id="do_nothing" type="button" value="Do Nothing" />
   {{else}}
     <h4>Waiting on {{getDisplayName game.state.user}} to choose an action.</h4>
@@ -26,7 +28,7 @@
           <ul class="list-unstyled">
             <li>
               <label class="radio-inline">
-                <input type="radio" name="choose_winner" value="attacker"/>
+                <input type="radio" name="choose_winner" value="attacker" checked="checked"/>
                 Attacker
               </label>
             </li>
@@ -66,7 +68,7 @@
           {{#with getCard this.card}}
             <li>
               <label class="radio-inline">
-                <input type="radio" name="play_card" value="{{_id}}">
+                <input type="radio" name="play_card" value="{{_id}}" checked="checked">
                 {{name}}
               </label>
             </li>
@@ -126,7 +128,7 @@
     {{#if isMe _id}}
     {{else}}
       <label class="radio-inline">
-        <input type="radio" name="target" value="{{_id}}" >
+        <input type="radio" name="target" value="{{_id}}" checked="checked" >
         {{getDisplayName _id}}
       </label>
     {{/if}}
@@ -142,7 +144,7 @@
           {{else}}
           <li>
             <label class="radio-inline">
-              <input type="radio" name="target" value="{{_id}}" >
+              <input type="radio" name="target" value="{{_id}}" checked="checked">
               {{getDisplayName _id}}
             </label>
           </li>
@@ -169,13 +171,13 @@
   {{#each game.players}}
     {{#if attacking}}
       <label class="radio-inline">
-        <input type="radio" name="support" value="{{_id}}" >
+        <input type="radio" name="support" value="{{_id}}" checked="checked">
         {{getDisplayName _id}} (Attacking)
       </label>
     {{else}}
       {{#if defending}}
       <label class="radio-inline">
-        <input type="radio" name="support" value="{{_id}}" >
+        <input type="radio" name="support" value="{{_id}}" checked="checked">
         {{getDisplayName _id}} (Defending)
       </label>
       {{/if}}
@@ -255,7 +257,7 @@
             {{#with getCard this.card}}
               <li>
                 <label class="radio-inline">
-                  <input type="radio" name="steal_card" value="{{_id}}" >
+                  <input type="radio" name="steal_card" value="{{_id}}" checked="checked">
                   {{name}}
                 </label>
               </li>
@@ -292,7 +294,7 @@
       {{#with getCard this.card}}
         <li>
           <label class="radio-inline">
-            <input type="radio" name="trade_card" value="{{_id}}">
+            <input type="radio" name="trade_card" value="{{_id}}" checked="checked">
             {{name}}
           </label>
         </li>
@@ -308,7 +310,7 @@
         {{else}}
         <li>
           <label class="radio-inline">
-            <input type="radio" name="trade_target" value="{{_id}}" >
+            <input type="radio" name="trade_target" value="{{_id}}" checked="checked">
             {{getDisplayName _id}}
           </label>
         </li>
@@ -355,7 +357,7 @@
         {{#with getCard this.card}}
           <li>
             <label class="radio-inline">
-              <input type="radio" name="trade_card" value="{{_id}}">
+              <input type="radio" name="trade_card" value="{{_id}}" checked="checked">
               {{name}}
             </label>
           </li>
@@ -416,6 +418,28 @@
   {{/if}}
 </template>
 <template name="COAT">
+  {{#if game.state.meta.success}}
+    <h4>Finished resolving Coat's effects (either exchanged professions or not).</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>You traded a <b>Coat</b>. You may exchange your profession with an unused profession.</h4>
+    <ul class="list-unstyled">
+      {{#each objectify game.prof_deck}}
+        <li>
+          <label class="radio-inline">
+            <input type="radio" name="prof_id" value="{{_id}}" checked="checked">
+            {{name}}
+          </label>
+        </li>
+      {{/each}}
+    </ul>
+    <input class="btn btn-success" id="exchange_profs" type="button" value="Exchange" />
+    <input class="btn btn-failure" id="no_exchange_profs" type="button" value="Don't exchange" />
+  {{/if}}
 </template>
 <template name="MONOCLE">
   {{#if game.state.meta.success}}
@@ -453,6 +477,18 @@
 <template name="ASTROLABE">
 </template>
 <template name="TOME">
+  {{#if game.state.meta.success}}
+    <h4>Finished resolving Tome's effects (either traded professions or not).</h4>
+    {{#if is_done game._id}}
+      <input class="btn btn-success" id="end_turn" type="button" value="End Turn" />
+    {{else}}
+      <input class="btn btn-success" id="continue" type="button" value="Continue" />
+    {{/if}}
+  {{else}}
+    <h4>You traded a <b>Tome</b>. You may exchange professions with your trading partner.</h4>
+    <input class="btn btn-success" id="exchange_profs" type="button" value="Exchange" />
+    <input class="btn btn-failure" id="no_exchange_profs" type="button" value="Don't exchange" />
+  {{/if}}
 </template>
 <template name="NO_EFFECT">
   {{#if game.state.meta.success}}
@@ -527,7 +563,7 @@
         </div>
         <div>
           <input class="btn btn-success" id="make_declaration" type="button" value="Make Declaration" />
-          <input class="btn btn-failure" type="button" value="Go back" />
+          <input class="btn btn-failure" id="go_back" type="button" value="Go back" />
         </div>
       </div>
     {{else}}

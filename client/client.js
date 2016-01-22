@@ -161,6 +161,13 @@ UI.registerHelper('is_done', function(gameId) {
 /**************/
 /* TURN START */
 /**************/
+Template.TURN_START.helpers({
+  'can_declare_victory': function(cards) {
+    return _.find(cards, function(c) {
+      return c.card === Cards.BLACK_PEARL._id
+    }) === undefined;
+  },
+});
 Template.TURN_START.events({
   'click #play_profession': function(event, template) {
     Meteor.call('play_profession', template.data.game._id, Meteor.user()._id);
@@ -483,6 +490,44 @@ Template.PRIVILEGE.events({
   'click #resolve_action': function(event, template) {
     Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
       {resolve_action: Cards.PRIVILEGE._id});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
+Template.TOME.events({
+  'click #exchange_profs': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.TOME._id, exchange: true});
+  },
+  'click #no_exchange_profs': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.TOME._id, exchange: false});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
+Template.COAT.helpers({
+  'objectify': function(prof_deck) {
+    return _.map(prof_deck, function(p) {return {name: getProfById(p).name, _id: p};});
+  },
+});
+Template.COAT.events({
+  'click #exchange_profs': function(event, template) {
+    var newProf = $("input:checked[name=prof_id]").val();
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.COAT._id, exchange: true, new_prof: newProf});
+  },
+  'click #no_exchange_profs': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.COAT._id, exchange: false});
   },
   'click #continue': function(event, template) {
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});

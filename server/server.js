@@ -55,7 +55,7 @@ function dealAssociations(num_players) {
 function dealCards(deck, num_players) {
   var hands = [];
   // bags must be in starting pool of cards in players' hands
-  var drawn = [Cards.BAG_KEY._id, Cards.BAG_GOBLET._id];
+  var drawn = [Cards.MONOCLE._id, Cards.PRIVILEGE._id];
   for (var i = 0; i < num_players - 2; i++) {
     drawn.push(deck[0]);
     deck.splice(0, 1);
@@ -108,7 +108,7 @@ Meteor.methods({
       Cards.COAT, 
       Cards.MONOCLE, 
       Cards.PRIVILEGE, 
-      Cards.ASTROLABE, 
+      //Cards.ASTROLABE, 
       Cards.SHATTERED_MIRROR, 
       Cards.TOME, 
       Cards.DAGGER, 
