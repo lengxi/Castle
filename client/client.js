@@ -435,6 +435,62 @@ Template.BAG_GOBLET.events({
     Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
   }
 });
+Template.MONOCLE.helpers({
+  'getMonocleTargetName': function() {
+    var target = this.game.state.user;
+    if (me._id === this.game.state.user) {
+      target = this.game.state.meta.trade_target;
+    }
+    var user = Meteor.users.findOne({_id: target});
+    if (user.services) {
+      return user.services.github.username;
+    }
+    return "";
+  },
+  'getMonocleTargetAssociation': function() {
+    return ASSOCIATIONS[me.monocle_target_assoc];
+  },
+});
+Template.MONOCLE.events({
+  'click #resolve_action': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.MONOCLE._id});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
+Template.PRIVILEGE.helpers({
+  'getPrivilegeTargetName': function() {
+    var target = this.game.state.user;
+    if (me._id === this.game.state.user) {
+      target = this.game.state.meta.trade_target;
+    }
+    var user = Meteor.users.findOne({_id: target});
+    if (user.services) {
+      return user.services.github.username;
+    }
+    return "";
+  },
+  'getPrivilegeTargetCards': function() {
+    return me.privilege_target_cards;
+  },
+});
+Template.PRIVILEGE.events({
+  'click #resolve_action': function(event, template) {
+    Meteor.call('resolve_trade', template.data.game._id, Meteor.user()._id, 
+      {resolve_action: Cards.PRIVILEGE._id});
+  },
+  'click #continue': function(event, template) {
+    Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
+  }
+});
 
 /*******************/
 /* DECLARE_VICTORY */
