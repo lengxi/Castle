@@ -6,12 +6,11 @@
 </body>
 
 <template name="home">
-  <div class="container">
-    <div class="center jumbotron">
+  <div>
+  <div class="center jumbotron">
+    <div class="container">
     {{#if hasUser}}
-      <h1>Hi {{getDisplayName user._id}}! Click to join room.</h1>
-      <input id="create_room" type='button' value='Create Room' class="btn btn-lg btn-default"/>
-      {{> rooms}}
+      <h1>Hi {{getDisplayName user._id}}! Welcome to Castle!</h1>
     {{else}}
       <h1>Want to play Castle of the Devil?</h1>
       <p class="lead">Please log in!</p>
@@ -19,14 +18,33 @@
     {{/if}}
     </div>
   </div>
+
+  <div class="container">
+    <div class="row">
+      <p>Online players: 
+      {{#each users}}
+        {{getDisplayName _id}}
+      {{/each}}</p>
+    </div>
+    <div class="row">
+      {{#if hasUser}}
+      <div class="col-md-8">
+        <input id="create_room" type='button' value='Create Room' class="btn btn-lg btn-default"/>
+        {{> rooms}}
+      </div>
+      <div class="col-md-4">
+        {{> globalchat}}
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
 </template>
 
 <template name="rooms">
- 
   {{#each rooms}}
     {{> room}}
   {{/each}}
-
 </template>
 
 <template name="room">
@@ -44,6 +62,21 @@
     <input id="start_game" type='button' value='Start' class="btn btn-success">
     <input id="leave_room" type='button' value='Leave' class="btn btn-failure">
   </div>
+</template>
+
+<template name="globalchat">
+<h4>Chat</h4>
+<table class="table table-striped">
+  <tbody>
+{{#each chats}}
+<tr><td><b>{{getDisplayName user}}</b>: {{message}}</td></tr>
+{{/each}}
+</tbody>
+</table>
+<div class="form-inline">
+  <input type="text" class="form-control" id="chat_message_box" name="chat_message" placeholder="...">
+  <input id="send_message" type='button' value='Enter' class="btn btn-success">
+</div>
 </template>
 
 <template name="game">

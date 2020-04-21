@@ -171,18 +171,22 @@
   {{#each game.players}}
     {{#if attacking}}
       <label class="radio-inline">
-        <input type="radio" name="support" value="{{_id}}" checked="checked">
+        <input type="radio" name="support" value="{{_id}}">
         {{getDisplayName _id}} (Attacking)
       </label>
     {{else}}
       {{#if defending}}
       <label class="radio-inline">
-        <input type="radio" name="support" value="{{_id}}" checked="checked">
+        <input type="radio" name="support" value="{{_id}}">
         {{getDisplayName _id}} (Defending)
       </label>
       {{/if}}
     {{/if}}
   {{/each}}
+    <label class="radio-inline">
+      <input type="radio" name="support" value="undefined" checked="checked">
+      No one
+    </label>
   </div><br />
   <input class="btn btn-success" id="choose_support" type="button" value="Declare Support" />
   {{/if}}
@@ -553,7 +557,7 @@
           </label>
         </div>
 
-        <b>Nominate players:</b>
+        <b>Nominate players (must have a victory object):</b>
         <div>
           {{#each game.players}}
           <label>
@@ -562,8 +566,8 @@
           {{/each}}
         </div>
         <div>
-          <input class="btn btn-success" id="make_declaration" type="button" value="Make Declaration" />
-          <input class="btn btn-failure" id="go_back" type="button" value="Go back" />
+          <input class="btn btn-success" id="make_declaration" type="button" value="Make declaration" />
+          <input class="btn btn-failure" id="end_turn" type="button" value="I fucked up, end my turn" />
         </div>
       </div>
     {{else}}

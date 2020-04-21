@@ -8,5 +8,7 @@
     </li>
     <li>Turn Order: {{me.turn}}</li>
     <li>Profession: <a href="#" data-toggle="tooltip" title="{{getProfessionDesc me.prof}}">{{getProfessionName me.prof}}</a>{{#if prof_state}} (Played) {{/if}}</li>
+    <li>Cards: {{game.deck.length}}</li>
+    <li>Profs: {{game.prof_deck.length}}</li>
   </ul>
 </template>

@@ -1,13 +1,14 @@
 Meteor.subscribe('userData');
 Meteor.subscribe('rooms');
 Meteor.subscribe('games');
+Meteor.subscribe('chats');
 
 Handlebars.registerHelper('getDisplayName', function(id) {
   var user = Meteor.users.findOne({_id: id});
-  if (user.services) {
+  if (user && user.services) {
     return user.services.github.username;
   }
-  return "";
+  return "no one";
 });
 
 Handlebars.registerHelper('getProfessionName', function(id) {
@@ -103,6 +104,9 @@ Template.home.helpers({
   },
   user: function () {
     return Meteor.user();
+  },
+  users: function () {
+    return Meteor.users.find({});
   }
 });
 Template.home.events({
@@ -129,6 +133,27 @@ Template.room.events({
   },
   'click #start_game': function () {
     Meteor.call('start_game', this._id, Meteor.user());
+  }
+});
+
+Template.globalchat.events({
+  'click #send_message': function () {
+    var message = $("input[name=chat_message]").val();
+    $("input[name=chat_message]").val("");
+    Meteor.call('send_message', Meteor.user(), message);
+  },
+  'keypress #chat_message_box': function (evt, template) {
+    if (evt.which === 13) {
+      var message = $("input[name=chat_message]").val();
+      $("input[name=chat_message]").val("");
+      Meteor.call('send_message', Meteor.user(), message);
+    }
+  }
+});
+
+Template.globalchat.helpers({
+  chats: function() {
+    return Chats.find({});
   }
 });
 
@@ -381,10 +406,13 @@ Template.RESOLVE_TRADE.helpers({
   },
   'getCardTemplate': function() {
     var card;
+    var otherCard;
     if (this.game.state.wait_on === this.game.state.user) {
       card = this.game.state.meta.trade_card;
+      otherCard = this.game.state.meta.trade_response_card;
     } else {
       card = this.game.state.meta.trade_response_card;
+      otherCard = this.game.state.meta.trade_card;
     }
     switch(card) {
       case Cards.BAG_KEY._id:
@@ -550,6 +578,9 @@ Template.DECLARE_VICTORY.events({
     Meteor.call('handle_callback', template.data.game._id, Meteor.user()._id, {
       nominated_team: nominatedTeam, 
       nominated_player_ids: nominatedPlayerIds});
+  },
+  'click #end_turn': function(event, template) {
+    Meteor.call('end_turn', template.data.game._id, Meteor.user()._id, {});
   }
 });
 
